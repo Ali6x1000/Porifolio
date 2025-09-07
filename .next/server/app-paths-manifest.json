@@ -1,5 +1,7 @@
 {
-  "/resume/page": "app/resume/page.js",
+  "/Baghdad/page": "app/Baghdad/page.js",
   "/page": "app/page.js",
-  "/Baghdad/page": "app/Baghdad/page.js"
+  "/resume/page": "app/resume/page.js",
+  "/projects/page": "app/projects/page.js",
+  "/blog/page": "app/blog/page.js"
 }

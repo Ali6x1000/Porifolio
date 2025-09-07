@@ -40,7 +40,7 @@ interface ResumeData {
 export default function ResumeEditor() {
   const [resumeData, setResumeData] = useState<ResumeData>({
     personal: {
-      name: 'Your Name',
+      name: 'Ali Nawaf',
       email: 'your.email@example.com',
       phone: '(555) 123-4567',
       location: 'City, State'

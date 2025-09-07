@@ -2,14 +2,55 @@
 
 import { motion } from 'framer-motion'
 import Link from 'next/link'
-import { ArrowRight, Code, Database, Globe } from 'lucide-react'
+import { ArrowRight, Code, Database, Globe, Github, ExternalLink } from 'lucide-react'
+import { useState, useEffect } from 'react'
 
 export default function Home() {
+  const [featuredProjects, setFeaturedProjects] = useState<any[]>([])
+
   const skills = [
     { icon: Code, name: 'Programming', desc: 'JavaScript, Python, Java, C++' },
     { icon: Globe, name: 'Web Development', desc: 'React, Next.js, Node.js' },
     { icon: Database, name: 'Database', desc: 'MongoDB, PostgreSQL, MySQL' },
   ]
+
+  useEffect(() => {
+    // Get projects from localStorage and take first 3 as featured
+    const savedProjects = localStorage.getItem('projects')
+    if (savedProjects) {
+      const projects = JSON.parse(savedProjects)
+      setFeaturedProjects(projects.slice(0, 3))
+    } else {
+      // Default featured projects if none saved
+      const defaultProjects = [
+        {
+          id: '1',
+          title: 'Computer Vision SmartLabeler',
+          description: 'Built an interface on top of Label-Studio to automate annotations, reducing cost and manpower for labeling images.',
+          technologies: ['PyTorch', 'Python', 'Docker', 'API'],
+          github: 'https://github.com/alinawaf/smartlabeler',
+          demo: null,
+        },
+        {
+          id: '2',
+          title: 'ElectroVector App',
+          description: 'Data analytics Swift + Python app converting ECGs into vectorcardiograms, extracting clinically meaningful metrics.',
+          technologies: ['Swift', 'Python', 'API', 'Healthcare'],
+          github: 'https://github.com/alinawaf/electrovector',
+          demo: null,
+        },
+        {
+          id: '3',
+          title: 'Hockey Analytics ML',
+          description: 'Computer vision models for real-time video analysis, achieving 3× accuracy gains and faster inference speed.',
+          technologies: ['PyTorch', 'TensorFlow', 'iOS', 'ML'],
+          github: 'https://github.com/alinawaf/hockey-ml',
+          demo: null,
+        }
+      ]
+      setFeaturedProjects(defaultProjects)
+    }
+  }, [])
 
   return (
     <div className="pt-16">
@@ -76,7 +117,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Recent Projects Preview */}
+      {/* Featured Projects Section */}
       <section className="section-padding bg-gray-100">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-12">
@@ -85,22 +126,64 @@ export default function Home() {
           </div>
           
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-8">
-            {[1, 2, 3].map((project) => (
-              <div key={project} className="card">
-                <div className="h-48 bg-gray-200 rounded-lg mb-4"></div>
-                <h3 className="text-xl font-semibold mb-2">Project {project}</h3>
-                <p className="text-gray-600 mb-4">
-                  A brief description of this amazing project and its features.
-                </p>
-                <div className="flex gap-2">
-                  <span className="bg-primary-100 text-primary-800 px-2 py-1 rounded text-sm">
-                    React
-                  </span>
-                  <span className="bg-primary-100 text-primary-800 px-2 py-1 rounded text-sm">
-                    Node.js
-                  </span>
+            {featuredProjects.map((project, index) => (
+              <motion.div
+                key={project.id || index}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: index * 0.1 }}
+                className="card group hover:scale-105 transition-transform duration-300"
+              >
+                <div className="h-48 bg-gradient-to-br from-primary-100 to-primary-200 rounded-lg mb-4 flex items-center justify-center">
+                  <Code className="text-primary-600" size={48} />
                 </div>
-              </div>
+                
+                <h3 className="text-xl font-semibold mb-2">{project.title}</h3>
+                <p className="text-gray-600 mb-4 line-clamp-3">
+                  {project.description}
+                </p>
+                
+                <div className="flex flex-wrap gap-2 mb-4">
+                  {project.technologies.slice(0, 3).map((tech: string) => (
+                    <span
+                      key={tech}
+                      className="bg-primary-100 text-primary-800 px-2 py-1 rounded text-sm"
+                    >
+                      {tech}
+                    </span>
+                  ))}
+                  {project.technologies.length > 3 && (
+                    <span className="text-sm text-gray-500">
+                      +{project.technologies.length - 3} more
+                    </span>
+                  )}
+                </div>
+                
+                <div className="flex gap-3">
+                  {project.github && (
+                    <a
+                      href={project.github}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-2 text-gray-600 hover:text-primary-600 transition-colors text-sm"
+                    >
+                      <Github size={16} />
+                      Code
+                    </a>
+                  )}
+                  {project.demo && (
+                    <a
+                      href={project.demo}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-2 text-gray-600 hover:text-primary-600 transition-colors text-sm"
+                    >
+                      <ExternalLink size={16} />
+                      Demo
+                    </a>
+                  )}
+                </div>
+              </motion.div>
             ))}
           </div>
           
