@@ -4,7 +4,18 @@ const nextConfig = {
     appDir: true,
   },
   images: {
-    domains: ['github.com', 'via.placeholder.com'],
+    domains: ['images.unsplash.com', 'via.placeholder.com'],
+    unoptimized: true
+  },
+  distDir: 'out',
+  trailingSlash: true,
+  skipTrailingSlashRedirect: true,
+  webpack: (config) => {
+    config.resolve.fallback = {
+      ...config.resolve.fallback,
+      fs: false,
+    };
+    return config;
   },
 }
 

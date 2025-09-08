@@ -1,7 +1,15 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
-import { Plus, Edit, Trash2, Save, Bold, Italic, Underline, List, ListOrdered, Link, Image, Code, Quote, Eye, EyeOff } from 'lucide-react'
+import { 
+  Plus, Edit, Trash2, Save, Bold, Italic, Underline, List, 
+  ListOrdered, Link, Image, Code, Quote, Eye, EyeOff, Calculator, Sigma 
+} from 'lucide-react'
+import ReactMarkdown from 'react-markdown'
+import remarkMath from 'remark-math'
+import rehypeKatex from 'rehype-katex'
+import rehypeRaw from 'rehype-raw'
+import 'katex/dist/katex.min.css'
 
 interface BlogPost {
   id: string
@@ -23,9 +31,14 @@ export default function BlogEditor() {
   useEffect(() => {
     const savedPosts = localStorage.getItem('blog-posts')
     if (savedPosts) {
-      setPosts(JSON.parse(savedPosts))
+      try {
+        const parsedPosts = JSON.parse(savedPosts)
+        setPosts(Array.isArray(parsedPosts) ? parsedPosts : [])
+      } catch (error) {
+        console.error('Error parsing saved posts:', error)
+        setPosts([])
+      }
     } else {
-      // Initialize with default posts
       const defaultPosts: BlogPost[] = [
         {
           id: '1',
@@ -35,7 +48,34 @@ export default function BlogEditor() {
           readTime: '5 min read',
           slug: 'getting-started-nextjs-14',
           tags: ['Next.js', 'React', 'Web Development'],
-          content: 'Full blog content here...',
+          content: `# Getting Started with Next.js 14
+
+Next.js 14 introduces several exciting features that make building React applications even better.
+
+## Mathematical Expressions
+
+You can include mathematical expressions using LaTeX syntax:
+
+Inline math: The formula $E = mc^2$ is Einstein's mass-energy equivalence.
+
+Display math:
+$$\\int_0^\\infty e^{-x^2} dx = \\frac{\\sqrt{\\pi}}{2}$$
+
+Complex equations from an EM algorithm:
+$$\\pi_{A}^{\\text{new}} = \\frac{\\sum_{i=1}^{N} \\gamma(z_i=A) \\cdot x_i}{\\sum_{i=1}^{N} \\gamma(z_i=A)}$$
+For Coin B, the update is:
+$$\\pi_{B}^{\\text{new}} = \\frac{\\sum_{i=1}^{N} (1-\\gamma(z_i=A)) \\cdot x_i}{\\sum_{i=1}^{N} (1-\\gamma(z_i=A))}$$
+
+## Code Examples
+
+\`\`\`javascript
+const fibonacci = (n) => {
+  if (n <= 1) return n
+  return fibonacci(n - 1) + fibonacci(n - 2)
+}
+\`\`\`
+
+This is a great way to showcase both code and mathematical concepts!`,
           featuredImage: ''
         }
       ]
@@ -50,12 +90,17 @@ export default function BlogEditor() {
   }
 
   const handleSave = (post: BlogPost) => {
+    const finalPost = {
+      ...post,
+      slug: post.slug || post.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''),
+      id: post.id || Date.now().toString()
+    }
+
     if (isCreating) {
-      const newPost = { ...post, id: Date.now().toString() }
-      savePosts([...posts, newPost])
+      savePosts([...posts, finalPost])
       setIsCreating(false)
     } else {
-      const updatedPosts = posts.map(p => p.id === post.id ? post : p)
+      const updatedPosts = posts.map(p => p.id === finalPost.id ? finalPost : p)
       savePosts(updatedPosts)
     }
     setEditingPost(null)
@@ -98,7 +143,7 @@ export default function BlogEditor() {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold">Blog Posts</h2>
+        <h2 className="text-2xl font-bold">Blog Posts ({posts.length})</h2>
         <button
           onClick={createNewPost}
           className="btn-primary inline-flex items-center gap-2"
@@ -108,52 +153,68 @@ export default function BlogEditor() {
         </button>
       </div>
 
-      <div className="grid gap-4">
-        {posts.map((post) => (
-          <div key={post.id} className="card">
-            <div className="flex justify-between items-start">
-              <div className="flex-1">
-                {post.featuredImage && (
-                  <div className="w-20 h-20 bg-gray-200 rounded-lg mb-3 overflow-hidden">
-                    <img 
-                      src={post.featuredImage} 
-                      alt={post.title}
-                      className="w-full h-full object-cover"
-                      onError={(e) => {
-                        (e.target as HTMLImageElement).style.display = 'none'
-                      }}
-                    />
+      {posts.length === 0 ? (
+        <div className="text-center py-12">
+          <p className="text-gray-500 mb-4">No blog posts yet.</p>
+          <button
+            onClick={createNewPost}
+            className="btn-primary inline-flex items-center gap-2"
+          >
+            <Plus size={20} />
+            Create Your First Post
+          </button>
+        </div>
+      ) : (
+        <div className="grid gap-4">
+          {posts.map((post) => (
+            <div key={post.id} className="card">
+              <div className="flex justify-between items-start">
+                <div className="flex-1">
+                  {post.featuredImage && (
+                    <div className="w-20 h-20 bg-gray-200 rounded-lg mb-3 overflow-hidden">
+                      <img 
+                        src={post.featuredImage} 
+                        alt={post.title}
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).style.display = 'none'
+                        }}
+                      />
+                    </div>
+                  )}
+                  <h3 className="text-xl font-semibold mb-2">{post.title}</h3>
+                  <p className="text-gray-600 mb-3">{post.excerpt}</p>
+                  <div className="flex gap-2 mb-2 flex-wrap">
+                    {post.tags.map((tag) => (
+                      <span key={tag} className="bg-primary-100 text-primary-800 px-2 py-1 rounded text-sm">
+                        {tag}
+                      </span>
+                    ))}
                   </div>
-                )}
-                <h3 className="text-xl font-semibold mb-2">{post.title}</h3>
-                <p className="text-gray-600 mb-3">{post.excerpt}</p>
-                <div className="flex gap-2 mb-2">
-                  {post.tags.map((tag) => (
-                    <span key={tag} className="bg-primary-100 text-primary-800 px-2 py-1 rounded text-sm">
-                      {tag}
-                    </span>
-                  ))}
+                  <p className="text-sm text-gray-500">{post.date} • {post.readTime}</p>
+                  <p className="text-xs text-gray-400 mt-1">Slug: /{post.slug}</p>
                 </div>
-                <p className="text-sm text-gray-500">{post.date} • {post.readTime}</p>
-              </div>
-              <div className="flex gap-2 ml-4">
-                <button
-                  onClick={() => setEditingPost(post)}
-                  className="p-2 text-gray-600 hover:text-primary-600 rounded"
-                >
-                  <Edit size={18} />
-                </button>
-                <button
-                  onClick={() => handleDelete(post.id)}
-                  className="p-2 text-gray-600 hover:text-red-600 rounded"
-                >
-                  <Trash2 size={18} />
-                </button>
+                <div className="flex gap-2 ml-4">
+                  <button
+                    onClick={() => setEditingPost(post)}
+                    className="p-2 text-gray-600 hover:text-primary-600 rounded"
+                    title="Edit Post"
+                  >
+                    <Edit size={18} />
+                  </button>
+                  <button
+                    onClick={() => handleDelete(post.id)}
+                    className="p-2 text-gray-600 hover:text-red-600 rounded"
+                    title="Delete Post"
+                  >
+                    <Trash2 size={18} />
+                  </button>
+                </div>
               </div>
             </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
     </div>
   )
 }
@@ -170,14 +231,13 @@ function AdvancedBlogPostForm({
   const [formData, setFormData] = useState(post)
   const [isPreviewMode, setIsPreviewMode] = useState(false)
   const contentRef = useRef<HTMLTextAreaElement>(null)
-  const [cursorPosition, setCursorPosition] = useState(0)
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    if (!formData.slug) {
+    if (!formData.slug && formData.title) {
       setFormData(prev => ({ 
         ...prev, 
-        slug: prev.title.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')
+        slug: prev.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
       }))
     }
     onSave(formData)
@@ -186,27 +246,16 @@ function AdvancedBlogPostForm({
   const insertText = (before: string, after: string = '') => {
     const textarea = contentRef.current
     if (!textarea) return
-
     const start = textarea.selectionStart
     const end = textarea.selectionEnd
     const selectedText = formData.content.substring(start, end)
     const newText = before + selectedText + after
-    
-    const newContent = 
-      formData.content.substring(0, start) + 
-      newText + 
-      formData.content.substring(end)
-    
+    const newContent = formData.content.substring(0, start) + newText + formData.content.substring(end)
     setFormData(prev => ({ ...prev, content: newContent }))
-    
-    // Restore cursor position
     setTimeout(() => {
       if (textarea) {
         textarea.focus()
-        textarea.setSelectionRange(
-          start + before.length,
-          start + before.length + selectedText.length
-        )
+        textarea.setSelectionRange(start + before.length, start + before.length + selectedText.length)
       }
     }, 0)
   }
@@ -214,21 +263,19 @@ function AdvancedBlogPostForm({
   const insertMarkdown = (markdown: string) => {
     const textarea = contentRef.current
     if (!textarea) return
-
     const start = textarea.selectionStart
-    const newContent = 
-      formData.content.substring(0, start) + 
-      markdown + 
-      formData.content.substring(start)
-    
+    const newContent = formData.content.substring(0, start) + markdown + formData.content.substring(start)
     setFormData(prev => ({ ...prev, content: newContent }))
-    
     setTimeout(() => {
       if (textarea) {
         textarea.focus()
         textarea.setSelectionRange(start + markdown.length, start + markdown.length)
       }
     }, 0)
+  }
+
+  const insertLatex = (latex: string) => {
+    insertMarkdown(latex)
   }
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -243,24 +290,6 @@ function AdvancedBlogPostForm({
     }
   }
 
-  const renderPreview = (content: string) => {
-    // Simple markdown-to-HTML converter for preview
-    return content
-      .replace(/^# (.*$)/gim, '<h1 class="text-3xl font-bold mb-4">$1</h1>')
-      .replace(/^## (.*$)/gim, '<h2 class="text-2xl font-bold mb-3">$1</h2>')
-      .replace(/^### (.*$)/gim, '<h3 class="text-xl font-bold mb-2">$1</h3>')
-      .replace(/\*\*(.*)\*\*/gim, '<strong>$1</strong>')
-      .replace(/\*(.*)\*/gim, '<em>$1</em>')
-      .replace(/`(.*?)`/gim, '<code class="bg-gray-100 px-1 rounded">$1</code>')
-      .replace(/```([\s\S]*?)```/gim, '<pre class="bg-gray-100 p-4 rounded-lg overflow-x-auto"><code>$1</code></pre>')
-      .replace(/!\[([^\]]*)\]\(([^)]+)\)/gim, '<img src="$2" alt="$1" class="max-w-full h-auto rounded-lg my-4" />')
-      .replace(/\[([^\]]+)\]\(([^)]+)\)/gim, '<a href="$2" class="text-primary-600 hover:underline">$1</a>')
-      .replace(/^> (.*$)/gim, '<blockquote class="border-l-4 border-gray-300 pl-4 italic">$1</blockquote>')
-      .replace(/^\* (.*$)/gim, '<li>$1</li>')
-      .replace(/^\d+\. (.*$)/gim, '<li>$1</li>')
-      .replace(/\n/gim, '<br>')
-  }
-
   const toolbarButtons = [
     { icon: Bold, action: () => insertText('**', '**'), title: 'Bold' },
     { icon: Italic, action: () => insertText('*', '*'), title: 'Italic' },
@@ -270,6 +299,11 @@ function AdvancedBlogPostForm({
     { icon: List, action: () => insertMarkdown('* '), title: 'Bullet List' },
     { icon: ListOrdered, action: () => insertMarkdown('1. '), title: 'Numbered List' },
     { icon: Link, action: () => insertText('[Link Text](', ')'), title: 'Link' },
+  ]
+
+  const latexButtons = [
+    { icon: Calculator, action: () => insertLatex('$E = mc^2$'), title: 'Inline Math' },
+    { icon: Sigma, action: () => insertLatex('$$\\sum_{i=1}^{n} x_i$$'), title: 'Display Math' },
   ]
 
   return (
@@ -298,14 +332,21 @@ function AdvancedBlogPostForm({
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
-        {/* Basic Information */}
+        {/* Title and Slug */}
         <div className="grid md:grid-cols-2 gap-6">
           <div>
             <label className="block text-sm font-medium mb-2">Title</label>
             <input
               type="text"
               value={formData.title}
-              onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
+              onChange={(e) => {
+                const title = e.target.value
+                setFormData(prev => ({ 
+                  ...prev, 
+                  title,
+                  slug: prev.slug || title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
+                }))
+              }}
               className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
               required
             />
@@ -317,10 +358,12 @@ function AdvancedBlogPostForm({
               value={formData.slug}
               onChange={(e) => setFormData(prev => ({ ...prev, slug: e.target.value }))}
               className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+              placeholder="auto-generated-from-title"
             />
           </div>
         </div>
 
+        {/* Excerpt */}
         <div>
           <label className="block text-sm font-medium mb-2">Excerpt</label>
           <textarea
@@ -332,7 +375,7 @@ function AdvancedBlogPostForm({
           />
         </div>
 
-        {/* Meta Information */}
+        {/* Date, Read Time, Tags */}
         <div className="grid md:grid-cols-4 gap-4">
           <div>
             <label className="block text-sm font-medium mb-2">Date</label>
@@ -394,13 +437,12 @@ function AdvancedBlogPostForm({
           )}
         </div>
 
-        {/* Content Editor */}
+        {/* Enhanced Content Editor with LaTeX support */}
         <div>
           <label className="block text-sm font-medium mb-2">Content</label>
           
-          {!isPreviewMode && (
+          {!isPreviewMode ? (
             <>
-              {/* Toolbar */}
               <div className="border border-gray-300 rounded-t-lg bg-gray-50 p-2 flex flex-wrap gap-1">
                 {toolbarButtons.map((button, index) => (
                   <button
@@ -410,12 +452,28 @@ function AdvancedBlogPostForm({
                     title={button.title}
                     className="p-2 hover:bg-gray-200 rounded transition-colors"
                   >
-                    <button.icon size={16} />
+                    <button.icon size={18} />
                   </button>
                 ))}
-                <div className="border-l mx-2"></div>
+                
+                <div className="w-px h-6 bg-gray-300 mx-1" />
+                
+                {latexButtons.map((button, index) => (
+                  <button
+                    key={`latex-${index}`}
+                    type="button"
+                    onClick={button.action}
+                    title={button.title}
+                    className="p-2 hover:bg-gray-200 rounded transition-colors text-blue-600"
+                  >
+                    <button.icon size={18} />
+                  </button>
+                ))}
+                
+                <div className="w-px h-6 bg-gray-300 mx-1" />
+                
                 <label className="p-2 hover:bg-gray-200 rounded transition-colors cursor-pointer" title="Upload Image">
-                  <Image size={16} />
+                  <Image size={18} />
                   <input
                     type="file"
                     accept="image/*"
@@ -424,55 +482,57 @@ function AdvancedBlogPostForm({
                   />
                 </label>
               </div>
-
-              {/* Editor */}
+              
               <textarea
                 ref={contentRef}
                 value={formData.content}
                 onChange={(e) => setFormData(prev => ({ ...prev, content: e.target.value }))}
-                onSelect={(e) => setCursorPosition((e.target as HTMLTextAreaElement).selectionStart)}
                 rows={20}
-                className="w-full p-4 border border-gray-300 rounded-b-lg border-t-0 focus:ring-2 focus:ring-primary-500 focus:border-transparent font-mono text-sm resize-none"
-                placeholder="Write your blog content here using Markdown...
+                className="w-full p-3 border-x border-b border-gray-300 rounded-b-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent font-mono text-sm"
+                placeholder="Write your blog post content in Markdown format...
 
-Examples:
-# Heading 1
-## Heading 2
-**Bold text**
-*Italic text*
-`inline code`
-```
-code block
-```
-[Link](https://example.com)
-![Image](image-url)
-> Quote
-* Bullet point
-1. Numbered list"
+# Example heading
+Your content here...
+
+## Math examples:
+Inline math: $E = mc^2$
+Display math: $$\int_0^\infty e^{-x^2} dx$$
+
+```javascript
+// Code blocks work too
+console.log('Hello, world!')
+```"
                 required
               />
             </>
-          )}
-
-          {/* Preview */}
-          {isPreviewMode && (
+          ) : (
             <div className="border border-gray-300 rounded-lg p-6 bg-white min-h-[500px]">
-              <div 
-                className="prose prose-lg max-w-none"
-                dangerouslySetInnerHTML={{ 
-                  __html: renderPreview(formData.content) 
-                }}
-              />
+              <div className="prose prose-lg max-w-none">
+                <ReactMarkdown
+                  remarkPlugins={[remarkMath]}
+                  rehypePlugins={[rehypeKatex, rehypeRaw]}
+                  components={{
+                    code({node, inline, className, children, ...props}: {node: any, inline?: boolean, className?: string, children: React.ReactNode}) {
+                      const match = /language-(\w+)/.exec(className || '')
+                      return !inline && match ? (
+                        <pre className="bg-gray-100 p-4 rounded-lg overflow-auto">
+                          <code className={className} {...props}>
+                            {children}
+                          </code>
+                        </pre>
+                      ) : (
+                        <code className="bg-gray-100 px-1 py-0.5 rounded text-sm" {...props}>
+                          {children}
+                        </code>
+                      )
+                    }
+                  }}
+                >
+                  {formData.content || '*No content yet...*'}
+                </ReactMarkdown>
+              </div>
             </div>
           )}
-
-          {/* Helper Text */}
-          <div className="mt-2 text-sm text-gray-500">
-            <p>Supports Markdown formatting. Use the toolbar buttons or type Markdown directly.</p>
-            <p className="mt-1">
-              <strong>Quick tips:</strong> **bold**, *italic*, `code`, # heading, [link](url), ![image](url)
-            </p>
-          </div>
         </div>
       </form>
     </div>

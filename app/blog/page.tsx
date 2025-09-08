@@ -1,105 +1,145 @@
 'use client'
 
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import Link from 'next/link'
 import { Calendar, Clock, ArrowRight } from 'lucide-react'
-import { useState, useEffect } from 'react'
 
-export default function Blog() {
-  const [posts, setPosts] = useState<any[]>([])
+interface BlogPost {
+  id: string
+  title: string
+  excerpt: string
+  date: string
+  readTime: string
+  slug: string
+  tags: string[]
+  content: string
+  featuredImage?: string
+}
+
+export default function BlogPage() {
+  const [posts, setPosts] = useState<BlogPost[]>([])
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    
     const savedPosts = localStorage.getItem('blog-posts')
     if (savedPosts) {
-      setPosts(JSON.parse(savedPosts))
-    } else {
-      // Default posts if none saved
-      const defaultPosts = [
-        {
-          title: 'Getting Started with Next.js 14',
-          excerpt: 'Learn how to build modern web applications with the latest features in Next.js 14, including the app directory and server components.',
-          date: '2024-01-15',
-          readTime: '5 min read',
-          slug: 'getting-started-nextjs-14',
-          tags: ['Next.js', 'React', 'Web Development']
-        }
-      ]
-      setPosts(defaultPosts)
+      try {
+        const parsedPosts = JSON.parse(savedPosts)
+        setPosts(Array.isArray(parsedPosts) ? parsedPosts : [])
+      } catch (error) {
+        console.error('Error parsing saved posts:', error)
+        setPosts([])
+      }
     }
+    setLoading(false)
   }, [])
 
-  return (
-    <div className="pt-16">
-      <section className="section-padding">
-        <div className="max-w-4xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-center mb-12"
-          >
-            <h1 className="text-4xl font-bold mb-4">Blog</h1>
-            <p className="text-xl text-gray-600">
-              Thoughts on software development, technology, and computer science
-            </p>
-          </motion.div>
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-primary-50 to-secondary-50 py-20">
+        <div className="max-w-4xl mx-auto px-4 text-center">
+          <div className="animate-spin w-8 h-8 border-2 border-primary-600 border-t-transparent rounded-full mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading blog posts...</p>
+        </div>
+      </div>
+    )
+  }
 
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-primary-50 to-secondary-50 py-20">
+      <div className="max-w-4xl mx-auto px-4">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+          className="text-center mb-16"
+        >
+          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+            Blog
+          </h1>
+          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+            Thoughts, tutorials, and insights about web development, technology, and more.
+          </p>
+        </motion.div>
+
+        {posts.length === 0 ? (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.2 }}
+            className="text-center py-12"
+          >
+            <p className="text-gray-500 text-lg">No blog posts available yet.</p>
+            <p className="text-gray-400 mt-2">Check back soon for new content!</p>
+          </motion.div>
+        ) : (
           <div className="space-y-8">
             {posts.map((post, index) => (
               <motion.article
-                key={post.slug}
+                key={post.id}
                 initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: index * 0.1 }}
-                className="card hover:shadow-xl transition-shadow duration-300"
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
+                className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300"
               >
-                <div className="flex flex-col">
-                  <h2 className="text-2xl font-bold mb-3 hover:text-primary-600 transition-colors">
-                    <Link href={`/blog/${post.slug}`}>
-                      {post.title}
-                    </Link>
-                  </h2>
-                  
-                  <p className="text-gray-600 mb-4 line-clamp-2">
-                    {post.excerpt}
-                  </p>
-                  
-                  <div className="flex flex-wrap gap-2 mb-4">
-                    {post.tags.map((tag: string) => (
-                      <span
-                        key={tag}
-                        className="bg-primary-100 text-primary-800 px-2 py-1 rounded text-sm"
-                      >
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
-                  
-                  <div className="flex items-center justify-between text-gray-500 text-sm">
-                    <div className="flex items-center gap-4">
+                <div className="md:flex">
+                  {post.featuredImage && (
+                    <div className="md:w-1/3">
+                      <img
+                        src={post.featuredImage}
+                        alt={post.title}
+                        className="w-full h-48 md:h-full object-cover"
+                      />
+                    </div>
+                  )}
+                  <div className={`p-6 ${post.featuredImage ? 'md:w-2/3' : 'w-full'}`}>
+                    <div className="flex items-center gap-4 text-sm text-gray-500 mb-3">
                       <div className="flex items-center gap-1">
                         <Calendar size={16} />
-                        <span>{new Date(post.date).toLocaleDateString()}</span>
+                        {new Date(post.date).toLocaleDateString()}
                       </div>
                       <div className="flex items-center gap-1">
                         <Clock size={16} />
-                        <span>{post.readTime}</span>
+                        {post.readTime}
                       </div>
+                    </div>
+                    
+                    <h2 className="text-2xl font-bold text-gray-900 mb-3 hover:text-primary-600 transition-colors">
+                      <Link href={`/blog/${post.slug}`}>
+                        {post.title}
+                      </Link>
+                    </h2>
+                    
+                    <p className="text-gray-600 mb-4 line-clamp-3">
+                      {post.excerpt}
+                    </p>
+                    
+                    <div className="flex flex-wrap gap-2 mb-4">
+                      {post.tags.map((tag) => (
+                        <span
+                          key={tag}
+                          className="bg-primary-100 text-primary-800 px-3 py-1 rounded-full text-sm"
+                        >
+                          {tag}
+                        </span>
+                      ))}
                     </div>
                     
                     <Link
                       href={`/blog/${post.slug}`}
-                      className="text-primary-600 hover:text-primary-700 flex items-center gap-1 font-medium"
+                      className="inline-flex items-center gap-2 text-primary-600 hover:text-primary-700 font-medium transition-colors"
                     >
-                      Read more <ArrowRight size={16} />
+                      Read more
+                      <ArrowRight size={16} />
                     </Link>
                   </div>
                 </div>
               </motion.article>
             ))}
           </div>
-        </div>
-      </section>
+        )}
+      </div>
     </div>
   )
 }
