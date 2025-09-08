@@ -7,7 +7,6 @@ const nextConfig = {
     domains: ['images.unsplash.com', 'via.placeholder.com'],
     unoptimized: true
   },
-  distDir: 'out',
   trailingSlash: true,
   skipTrailingSlashRedirect: true,
   webpack: (config) => {
