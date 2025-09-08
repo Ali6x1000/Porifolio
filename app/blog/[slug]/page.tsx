@@ -4,6 +4,46 @@ import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import Link from 'next/link'
 import { Calendar, Clock, ArrowLeft } from 'lucide-react'
+import Markdown from "react-markdown";
+import rehypePrism from "rehype-prism-plus";
+import 'prism-themes/themes/prism-vsc-dark-plus.css'
+import ReactMarkdown from 'react-markdown'
+import rehypeKatex from 'rehype-katex'
+import remarkMath from 'remark-math'
+import rehypeRaw from "rehype-raw";
+import { ReactNode } from "react";
+
+type CodeProps = {
+  node?: any;
+  inline?: boolean;
+  className?: string;
+  children: ReactNode;
+} & React.HTMLAttributes<HTMLElement>;
+
+// CORRECTED: Add an 'img' component to handle image rendering and styling
+const components = {
+  code({ inline, className, children, ...props }: CodeProps) {
+    const match = /language-(\w+)/.exec(className || "");
+    return !inline && match ? (
+      <pre className="bg-gray-900 text-green-400 p-4 rounded-lg overflow-x-auto my-6 shadow-lg">
+        <code className={`language-${match[1]}`} {...props}>
+          {children}
+        </code>
+      </pre>
+    ) : (
+      <code className="bg-gray-100 px-1 py-0.5 rounded text-sm" {...props}>
+        {children}
+      </code>
+    );
+  },
+  // Add this img component to style your markdown images
+  img: ({node, ...props}: {node?: any, src?: string, alt?: string}) => (
+    <img 
+      className="max-w-full h-auto rounded-lg my-6 shadow-lg" 
+      {...props} 
+    />
+  )
+};
 
 interface BlogPost {
   id: string
@@ -33,7 +73,6 @@ const renderLatex = (text: string): string => {
   
   return text
 }
-
 const escapeLatex = (latex: string): string => {
   // Enhanced LaTeX to Unicode/HTML conversion
   return latex
@@ -128,32 +167,6 @@ const escapeLatex = (latex: string): string => {
     .replace(/\\exp/g, 'exp')
 }
 
-const renderMarkdownWithLatex = (content: string) => {
-  // First render LaTeX
-  let html = renderLatex(content)
-  
-  // Then render markdown
-  html = html
-    .replace(/^# (.*$)/gim, '<h1 class="text-4xl font-bold mb-6 mt-8 text-gray-900">$1</h1>')
-    .replace(/^## (.*$)/gim, '<h2 class="text-3xl font-bold mb-4 mt-6 text-gray-800">$1</h2>')
-    .replace(/^### (.*$)/gim, '<h3 class="text-2xl font-bold mb-3 mt-5 text-gray-700">$1</h3>')
-    .replace(/\*\*(.*?)\*\*/gim, '<strong class="font-bold text-gray-900">$1</strong>')
-    .replace(/\*(.*?)\*/gim, '<em class="italic text-gray-800">$1</em>')
-    .replace(/`(.*?)`/gim, '<code class="bg-gray-100 px-2 py-1 rounded font-mono text-sm text-red-600">$1</code>')
-    .replace(/```([\s\S]*?)```/gim, '<pre class="bg-gray-900 text-green-400 p-4 rounded-lg overflow-x-auto my-6 shadow-lg"><code class="font-mono text-sm">$1</code></pre>')
-    .replace(/!\[([^\]]*)\]\(([^)]+)\)/gim, '<img src="$2" alt="$1" class="max-w-full h-auto rounded-lg my-6 shadow-lg" />')
-    .replace(/\[([^\]]+)\]\(([^)]+)\)/gim, '<a href="$2" class="text-blue-600 hover:text-blue-800 hover:underline font-medium">$1</a>')
-    .replace(/^> (.*$)/gim, '<blockquote class="border-l-4 border-blue-400 pl-6 italic bg-blue-50 py-4 my-4 rounded-r-lg">$1</blockquote>')
-    .replace(/^\* (.*$)/gim, '<li class="ml-6 mb-2">• $1</li>')
-    .replace(/^\d+\. (.*$)/gim, '<li class="ml-6 mb-2">$1</li>')
-    .replace(/\n\n/g, '</p><p class="mb-4">')
-    .replace(/\n/g, '<br>')
-  
-  // Wrap in paragraphs
-  html = '<p class="mb-4">' + html + '</p>'
-  
-  return html
-}
 
 function getBlogPost(slug: string): BlogPost | null {
   if (typeof window === 'undefined') return null
@@ -235,7 +248,7 @@ export default function BlogPost({ params }: { params: { slug: string } }) {
           line-height: 1.4;
         }
       `}</style>
-      
+  
       <article className="min-h-screen bg-white">
         <div className="max-w-4xl mx-auto px-4 py-8">
           <motion.div
@@ -243,14 +256,14 @@ export default function BlogPost({ params }: { params: { slug: string } }) {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
           >
-            <Link 
-              href="/blog" 
+            <Link
+              href="/blog"
               className="inline-flex items-center gap-2 text-primary-600 hover:text-primary-700 mb-8 transition-colors"
             >
               <ArrowLeft size={20} />
               Back to Blog
             </Link>
-
+  
             {post.featuredImage && (
               <div className="mb-8 rounded-2xl overflow-hidden shadow-lg">
                 <img
@@ -260,15 +273,15 @@ export default function BlogPost({ params }: { params: { slug: string } }) {
                 />
               </div>
             )}
-
+  
             <header className="mb-8">
               <div className="flex flex-wrap items-center gap-4 text-sm text-gray-500 mb-4">
                 <div className="flex items-center gap-1">
                   <Calendar size={16} />
-                  {new Date(post.date).toLocaleDateString('en-US', {
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric'
+                  {new Date(post.date).toLocaleDateString("en-US", {
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric",
                   })}
                 </div>
                 <div className="flex items-center gap-1">
@@ -276,15 +289,13 @@ export default function BlogPost({ params }: { params: { slug: string } }) {
                   {post.readTime}
                 </div>
               </div>
-
+  
               <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
                 {post.title}
               </h1>
-
-              <p className="text-xl text-gray-600 mb-6">
-                {post.excerpt}
-              </p>
-
+  
+              <p className="text-xl text-gray-600 mb-6">{post.excerpt}</p>
+  
               <div className="flex flex-wrap gap-2">
                 {post.tags.map((tag) => (
                   <span
@@ -296,18 +307,20 @@ export default function BlogPost({ params }: { params: { slug: string } }) {
                 ))}
               </div>
             </header>
-
+  
             <div className="prose prose-lg max-w-none">
-              <div 
-                dangerouslySetInnerHTML={{ 
-                  __html: renderMarkdownWithLatex(post.content) 
-                }}
-                className="text-gray-700 leading-relaxed"
-              />
+            <ReactMarkdown
+    remarkPlugins={[remarkMath]}
+    rehypePlugins={[rehypeKatex, rehypeRaw, rehypePrism]}
+    components={components}
+  >
+    {post.content}
+  </ReactMarkdown>
             </div>
           </motion.div>
         </div>
       </article>
     </>
-  )
+  );
+  
 }

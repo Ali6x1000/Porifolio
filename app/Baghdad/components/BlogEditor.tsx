@@ -10,7 +10,9 @@ import remarkMath from 'remark-math'
 import rehypeKatex from 'rehype-katex'
 import rehypeRaw from 'rehype-raw'
 import 'katex/dist/katex.min.css'
-
+import Markdown from "react-markdown";
+import rehypePrism from "rehype-prism-plus";
+import "prism-themes/themes/prism-vsc-dark-plus.css";
 interface BlogPost {
   id: string
   title: string
@@ -278,17 +280,60 @@ function AdvancedBlogPostForm({
     insertMarkdown(latex)
   }
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (file) {
-      const reader = new FileReader()
-      reader.onload = (event) => {
-        const imageUrl = event.target?.result as string
-        insertMarkdown(`![Image description](${imageUrl})`)
-      }
-      reader.readAsDataURL(file)
+
+// Add this state to track uploaded images
+const [uploadedImages, setUploadedImages] = useState<string[]>([])
+
+// Enhanced handleImageUpload with preview
+// A revised handleImageUpload function for your AdvancedBlogPostForm component
+
+const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const file = e.target.files?.[0];
+  if (!file) return;
+
+  // 1. Create a unique ID for this specific upload
+  const tempId = `uploading-${Date.now()}-${file.name}`;
+  const loadingText = `![Uploading ${file.name}...](${tempId})`;
+  
+  // 2. Insert the unique placeholder at the cursor position
+  insertMarkdown(loadingText + '\n');
+  
+  try {
+    const uploadFormData = new FormData();
+    uploadFormData.append('file', file);
+
+    const response = await fetch('/api/upload', {
+      method: 'POST',
+      body: uploadFormData,
+    });
+
+    if (!response.ok) {
+      throw new Error('Upload failed with status: ' + response.status);
     }
+
+    const { url } = await response.json();
+
+    // 3. Replace the unique placeholder with the final Markdown
+    setFormData(prev => ({
+      ...prev,
+      content: prev.content.replace(loadingText, `![${file.name}](${url})`)
+    }));
+
+  } catch (error) {
+    console.error('Image upload failed:', error);
+    alert('Failed to upload image. Please try again.');
+    
+    // 4. On error, remove the unique placeholder
+    setFormData(prev => ({
+      ...prev,
+      content: prev.content.replace(loadingText, '')
+    }));
+  } finally {
+      // Clear the file input so the user can upload the same file again
+      e.target.value = '';
   }
+};
+
 
   const toolbarButtons = [
     { icon: Bold, action: () => insertText('**', '**'), title: 'Bold' },
@@ -508,28 +553,31 @@ console.log('Hello, world!')
           ) : (
             <div className="border border-gray-300 rounded-lg p-6 bg-white min-h-[500px]">
               <div className="prose prose-lg max-w-none">
-                <ReactMarkdown
-                  remarkPlugins={[remarkMath]}
-                  rehypePlugins={[rehypeKatex, rehypeRaw]}
-                  components={{
-                    code({node, inline, className, children, ...props}: {node: any, inline?: boolean, className?: string, children: React.ReactNode}) {
-                      const match = /language-(\w+)/.exec(className || '')
-                      return !inline && match ? (
-                        <pre className="bg-gray-100 p-4 rounded-lg overflow-auto">
-                          <code className={className} {...props}>
-                            {children}
-                          </code>
-                        </pre>
-                      ) : (
-                        <code className="bg-gray-100 px-1 py-0.5 rounded text-sm" {...props}>
-                          {children}
-                        </code>
-                      )
-                    }
-                  }}
-                >
-                  {formData.content || '*No content yet...*'}
-                </ReactMarkdown>
+              <ReactMarkdown
+  remarkPlugins={[remarkMath]}
+  rehypePlugins={[rehypeKatex, rehypeRaw]}
+  components={{
+    code({node, inline, className, children, ...props}: {
+      node: any, inline?: boolean, className?: string, children: React.ReactNode
+    }) {
+      const match = /language-(\w+)/.exec(className || '')
+      return !inline && match ? (
+        <pre className="bg-gray-100 p-4 rounded-lg overflow-auto">
+          <code className={className} {...props}>
+            {children}
+          </code>
+        </pre>
+      ) : (
+        <code className="bg-gray-100 px-1 py-0.5 rounded text-sm" {...props}>
+          {children}
+        </code>
+      )
+    }
+  }}
+>
+  {formData.content || '*No content yet...*'}
+</ReactMarkdown>
+
               </div>
             </div>
           )}
