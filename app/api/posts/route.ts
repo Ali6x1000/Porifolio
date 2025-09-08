@@ -32,6 +32,7 @@ export async function POST(request: NextRequest) {
     await put(`posts/${post.slug}.json`, JSON.stringify(post, null, 2), {
       access: 'public',
       contentType: 'application/json',
+      allowOverwrite: true
     });
 
     return NextResponse.json(post);
