@@ -12,6 +12,7 @@ import rehypeKatex from 'rehype-katex'
 import remarkMath from 'remark-math'
 import rehypeRaw from "rehype-raw";
 import { ReactNode } from "react";
+import { list } from '@vercel/blob';
 
 type CodeProps = {
   node?: any;
@@ -57,115 +58,8 @@ interface BlogPost {
   featuredImage?: string
 }
 
-// Enhanced LaTeX rendering function
-const renderLatex = (text: string): string => {
-  // Handle display math ($$...$$)
-  text = text.replace(/\$\$([\s\S]*?)\$\$/g, (match, latex) => {
-    return `<div class="katex-display math-block bg-gradient-to-r from-blue-50 to-indigo-50 p-6 my-6 rounded-xl border-l-4 border-blue-400 overflow-x-auto shadow-sm">
-      <div class="katex-html font-mono text-lg text-center" style="font-family: 'Computer Modern', 'Times New Roman', serif;">${escapeLatex(latex.trim())}</div>
-    </div>`
-  })
-  
-  // Handle inline math ($...$)
-  text = text.replace(/\$([^$\n]+?)\$/g, (match, latex) => {
-    return `<span class="katex-inline math-inline bg-blue-50 px-2 py-1 rounded-md font-mono text-blue-900 border border-blue-200" style="font-family: 'Computer Modern', 'Times New Roman', serif;">${escapeLatex(latex.trim())}</span>`
-  })
-  
-  return text
-}
-const escapeLatex = (latex: string): string => {
-  // Enhanced LaTeX to Unicode/HTML conversion
-  return latex
-    // Fractions
-    .replace(/\\frac\{([^}]+)\}\{([^}]+)\}/g, '<span class="fraction"><span class="numerator">$1</span><span class="fraction-bar">—</span><span class="denominator">$2</span></span>')
-    // Square roots
-    .replace(/\\sqrt\{([^}]+)\}/g, '√($1)')
-    // Integrals and summations
-    .replace(/\\int/g, '∫')
-    .replace(/\\sum/g, '∑')
-    .replace(/\\prod/g, '∏')
-    .replace(/\\infty/g, '∞')
-    // Greek letters
-    .replace(/\\alpha/g, 'α')
-    .replace(/\\beta/g, 'β')
-    .replace(/\\gamma/g, 'γ')
-    .replace(/\\delta/g, 'δ')
-    .replace(/\\epsilon/g, 'ε')
-    .replace(/\\zeta/g, 'ζ')
-    .replace(/\\eta/g, 'η')
-    .replace(/\\theta/g, 'θ')
-    .replace(/\\iota/g, 'ι')
-    .replace(/\\kappa/g, 'κ')
-    .replace(/\\lambda/g, 'λ')
-    .replace(/\\mu/g, 'μ')
-    .replace(/\\nu/g, 'ν')
-    .replace(/\\xi/g, 'ξ')
-    .replace(/\\pi/g, 'π')
-    .replace(/\\rho/g, 'ρ')
-    .replace(/\\sigma/g, 'σ')
-    .replace(/\\tau/g, 'τ')
-    .replace(/\\upsilon/g, 'υ')
-    .replace(/\\phi/g, 'φ')
-    .replace(/\\chi/g, 'χ')
-    .replace(/\\psi/g, 'ψ')
-    .replace(/\\omega/g, 'ω')
-    // Capital Greek letters
-    .replace(/\\Gamma/g, 'Γ')
-    .replace(/\\Delta/g, 'Δ')
-    .replace(/\\Theta/g, 'Θ')
-    .replace(/\\Lambda/g, 'Λ')
-    .replace(/\\Xi/g, 'Ξ')
-    .replace(/\\Pi/g, 'Π')
-    .replace(/\\Sigma/g, 'Σ')
-    .replace(/\\Upsilon/g, 'Υ')
-    .replace(/\\Phi/g, 'Φ')
-    .replace(/\\Psi/g, 'Ψ')
-    .replace(/\\Omega/g, 'Ω')
-    // Superscripts and subscripts with braces
-    .replace(/\^\\?\{([^}]+)\}/g, '<sup>$1</sup>')
-    .replace(/_\\?\{([^}]+)\}/g, '<sub>$1</sub>')
-    // Simple superscripts and subscripts
-    .replace(/\^(\w)/g, '<sup>$1</sup>')
-    .replace(/_(\w)/g, '<sub>$1</sub>')
-    // Mathematical operators
-    .replace(/\\times/g, '×')
-    .replace(/\\div/g, '÷')
-    .replace(/\\pm/g, '±')
-    .replace(/\\mp/g, '∓')
-    .replace(/\\leq/g, '≤')
-    .replace(/\\geq/g, '≥')
-    .replace(/\\neq/g, '≠')
-    .replace(/\\approx/g, '≈')
-    .replace(/\\equiv/g, '≡')
-    .replace(/\\in/g, '∈')
-    .replace(/\\notin/g, '∉')
-    .replace(/\\subset/g, '⊂')
-    .replace(/\\supset/g, '⊃')
-    .replace(/\\cap/g, '∩')
-    .replace(/\\cup/g, '∪')
-    .replace(/\\forall/g, '∀')
-    .replace(/\\exists/g, '∃')
-    .replace(/\\nabla/g, '∇')
-    .replace(/\\partial/g, '∂')
-    // Arrows
-    .replace(/\\rightarrow/g, '→')
-    .replace(/\\leftarrow/g, '←')
-    .replace(/\\leftrightarrow/g, '↔')
-    .replace(/\\Rightarrow/g, '⇒')
-    .replace(/\\Leftarrow/g, '⇐')
-    .replace(/\\Leftrightarrow/g, '⇔')
-    // Limits
-    .replace(/\\lim/g, 'lim')
-    .replace(/\\max/g, 'max')
-    .replace(/\\min/g, 'min')
-    // Functions
-    .replace(/\\sin/g, 'sin')
-    .replace(/\\cos/g, 'cos')
-    .replace(/\\tan/g, 'tan')
-    .replace(/\\log/g, 'log')
-    .replace(/\\ln/g, 'ln')
-    .replace(/\\exp/g, 'exp')
-}
+
+
 
 
 function getBlogPost(slug: string): BlogPost | null {
@@ -188,11 +82,31 @@ export default function BlogPost({ params }: { params: { slug: string } }) {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    const foundPost = getBlogPost(params.slug)
-    setPost(foundPost)
-    setLoading(false)
-  }, [params.slug])
+    const fetchPost = async () => {
+      if (!params.slug) return;
+      
+      setLoading(true);
+      try {
+        // List blobs to find the correct URL for the given slug
+        const { blobs } = await list({ prefix: `posts/${params.slug}.json` });
+        if (blobs.length > 0) {
+          const postUrl = blobs[0].url;
+          const response = await fetch(postUrl); // Fetch the JSON file directly
+          const foundPost = await response.json();
+          setPost(foundPost);
+        } else {
+          setPost(null);
+        }
+      } catch (error) {
+        console.error("Failed to fetch post:", error);
+        setPost(null);
+      }
+      setLoading(false);
+    };
 
+    fetchPost();
+  }, [params.slug]);
+  
   if (loading) {
     return (
       <div className="min-h-screen bg-white py-20">

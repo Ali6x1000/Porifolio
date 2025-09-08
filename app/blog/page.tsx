@@ -17,24 +17,22 @@ interface BlogPost {
   featuredImage?: string
 }
 
+
 export default function BlogPage() {
   const [posts, setPosts] = useState<BlogPost[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    const savedPosts = localStorage.getItem('blog-posts')
-    if (savedPosts) {
-      try {
-        const parsedPosts = JSON.parse(savedPosts)
-        setPosts(Array.isArray(parsedPosts) ? parsedPosts : [])
-      } catch (error) {
-        console.error('Error parsing saved posts:', error)
-        setPosts([])
-      }
-    }
-    setLoading(false)
+    // FETCH posts from the API instead of localStorage
+    const fetchPosts = async () => {
+      setLoading(true);
+      const response = await fetch('/api/posts');
+      const data = await response.json();
+      setPosts(Array.isArray(data) ? data : []);
+      setLoading(false);
+    };
+    fetchPosts();
   }, [])
-
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-primary-50 to-secondary-50 py-20">

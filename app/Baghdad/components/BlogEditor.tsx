@@ -29,92 +29,47 @@ export default function BlogEditor() {
   const [posts, setPosts] = useState<BlogPost[]>([])
   const [editingPost, setEditingPost] = useState<BlogPost | null>(null)
   const [isCreating, setIsCreating] = useState(false)
+  const [isLoading, setIsLoading] = useState(true);
+
+  // FETCH posts from the API
+  const fetchPosts = async () => {
+    setIsLoading(true);
+    const response = await fetch('/api/posts');
+    const data = await response.json();
+    setPosts(Array.isArray(data) ? data : []);
+    setIsLoading(false);
+  };
 
   useEffect(() => {
-    const savedPosts = localStorage.getItem('blog-posts')
-    if (savedPosts) {
-      try {
-        const parsedPosts = JSON.parse(savedPosts)
-        setPosts(Array.isArray(parsedPosts) ? parsedPosts : [])
-      } catch (error) {
-        console.error('Error parsing saved posts:', error)
-        setPosts([])
-      }
-    } else {
-      const defaultPosts: BlogPost[] = [
-        {
-          id: '1',
-          title: 'Getting Started with Next.js 14',
-          excerpt: 'Learn how to build modern web applications with the latest features in Next.js 14.',
-          date: '2024-01-15',
-          readTime: '5 min read',
-          slug: 'getting-started-nextjs-14',
-          tags: ['Next.js', 'React', 'Web Development'],
-          content: `# Getting Started with Next.js 14
+    fetchPosts();
+  }, []);
 
-Next.js 14 introduces several exciting features that make building React applications even better.
-
-## Mathematical Expressions
-
-You can include mathematical expressions using LaTeX syntax:
-
-Inline math: The formula $E = mc^2$ is Einstein's mass-energy equivalence.
-
-Display math:
-$$\\int_0^\\infty e^{-x^2} dx = \\frac{\\sqrt{\\pi}}{2}$$
-
-Complex equations from an EM algorithm:
-$$\\pi_{A}^{\\text{new}} = \\frac{\\sum_{i=1}^{N} \\gamma(z_i=A) \\cdot x_i}{\\sum_{i=1}^{N} \\gamma(z_i=A)}$$
-For Coin B, the update is:
-$$\\pi_{B}^{\\text{new}} = \\frac{\\sum_{i=1}^{N} (1-\\gamma(z_i=A)) \\cdot x_i}{\\sum_{i=1}^{N} (1-\\gamma(z_i=A))}$$
-
-## Code Examples
-
-\`\`\`javascript
-const fibonacci = (n) => {
-  if (n <= 1) return n
-  return fibonacci(n - 1) + fibonacci(n - 2)
-}
-\`\`\`
-
-This is a great way to showcase both code and mathematical concepts!`,
-          featuredImage: ''
-        }
-      ]
-      setPosts(defaultPosts)
-      localStorage.setItem('blog-posts', JSON.stringify(defaultPosts))
-    }
-  }, [])
-
-  const savePosts = (updatedPosts: BlogPost[]) => {
-    setPosts(updatedPosts)
-    localStorage.setItem('blog-posts', JSON.stringify(updatedPosts))
-  }
-
-  const handleSave = (post: BlogPost) => {
+  const handleSave = async (post: BlogPost) => {
     const finalPost = {
       ...post,
       slug: post.slug || post.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''),
       id: post.id || Date.now().toString()
-    }
+    };
+    
+    // SAVE posts by sending to the API
+    await fetch('/api/posts', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(finalPost),
+    });
 
-    if (isCreating) {
-      savePosts([...posts, finalPost])
-      setIsCreating(false)
-    } else {
-      const updatedPosts = posts.map(p => p.id === finalPost.id ? finalPost : p)
-      savePosts(updatedPosts)
-    }
-    setEditingPost(null)
-  }
+    setEditingPost(null);
+    setIsCreating(false);
+    fetchPosts(); // Refetch to update the list
+  };
 
-  const handleDelete = (id: string) => {
+  const handleDelete = async (slug: string) => {
     if (confirm('Are you sure you want to delete this post?')) {
-      const updatedPosts = posts.filter(p => p.id !== id)
-      savePosts(updatedPosts)
+      // DELETE posts by sending to the API
+      await fetch(`/api/posts/${slug}`, { method: 'DELETE' });
+      fetchPosts(); // Refetch to update the list
     }
-  }
-
+  };
   const createNewPost = () => {
     const newPost: BlogPost = {
       id: '',
@@ -205,7 +160,7 @@ This is a great way to showcase both code and mathematical concepts!`,
                     <Edit size={18} />
                   </button>
                   <button
-                    onClick={() => handleDelete(post.id)}
+                    onClick={() => handleDelete(post.slug)}
                     className="p-2 text-gray-600 hover:text-red-600 rounded"
                     title="Delete Post"
                   >
