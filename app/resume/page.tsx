@@ -113,7 +113,7 @@ export default function Resume() {
                 <MapPin size={16} />
                 <span>Cleveland, OH</span>
               </div>
-               <a href="https://linkedin.com/in/your-profile-url" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 hover:text-primary-600">
+               <a href="https://www.linkedin.com/in/alinawaf/" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 hover:text-primary-600">
                 <ExternalLink size={16} />
                 <span>LinkedIn</span>
               </a>
