@@ -1,20 +1,23 @@
 {
   "app/Baghdad/page.tsx -> ./components/BlogEditor": {
-    "id": "app/Baghdad/page.tsx -> ./components/BlogEditor",
+    "id": 4594,
     "files": [
-      "static/chunks/_app-pages-browser_app_Baghdad_components_BlogEditor_tsx.js"
+      "static/css/3864b451a61e4546.css",
+      "static/chunks/d3ac728e.52267c66c9adf788.js",
+      "static/chunks/520.10610fbbd7f6b2e9.js",
+      "static/chunks/594.5706cf6f7f88c3e3.js"
     ]
   },
   "app/Baghdad/page.tsx -> ./components/ProjectEditor": {
-    "id": "app/Baghdad/page.tsx -> ./components/ProjectEditor",
+    "id": 2155,
     "files": [
-      "static/chunks/_app-pages-browser_app_Baghdad_components_ProjectEditor_tsx.js"
+      "static/chunks/155.8d2b10270a48b65e.js"
     ]
   },
   "app/Baghdad/page.tsx -> ./components/ResumeEditor": {
-    "id": "app/Baghdad/page.tsx -> ./components/ResumeEditor",
+    "id": 2818,
     "files": [
-      "static/chunks/_app-pages-browser_app_Baghdad_components_ResumeEditor_tsx.js"
+      "static/chunks/818.9fde4d2e830b4776.js"
     ]
   }
 }
