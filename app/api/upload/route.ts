@@ -1,49 +1,27 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { writeFile } from 'fs/promises'
-import path from 'path'
+// in app/api/upload/route.ts
+import { put } from '@vercel/blob';
+import { NextRequest, NextResponse } from 'next/server';
 
-export async function POST(request: NextRequest) {
+export async function POST(request: NextRequest): Promise<NextResponse> {
+  const { searchParams } = new URL(request.url);
+  // The filename is passed as a query parameter
+  const filename = searchParams.get('filename');
+
+  if (!filename || !request.body) {
+    return NextResponse.json({ error: 'No filename or file body provided' }, { status: 400 });
+  }
+
   try {
-    const formData = await request.formData()
-    const file = formData.get('file') as File
+    // Upload the file to Vercel Blob
+    const blob = await put(filename, request.body, {
+      access: 'public', // Make the file publicly accessible
+    });
+
+    // The 'blob' object contains the final URL
+    return NextResponse.json(blob);
     
-    if (!file) {
-      return NextResponse.json({ error: 'No file uploaded' }, { status: 400 })
-    }
-
-    // Check file type
-    if (!file.type.startsWith('image/')) {
-      return NextResponse.json({ error: 'Only images are allowed' }, { status: 400 })
-    }
-
-    // Generate unique filename
-    const timestamp = Date.now()
-    const originalName = file.name.replace(/[^a-zA-Z0-9.-]/g, '')
-    const filename = `${timestamp}-${originalName}`
-
-    // Convert file to buffer
-    const bytes = await file.arrayBuffer()
-    const buffer = Buffer.from(bytes)
-
-    // Save to public/uploads directory
-    const uploadsDir = path.join(process.cwd(), 'public', 'uploads')
-    const filePath = path.join(uploadsDir, filename)
-
-    // Create uploads directory if it doesn't exist
-    const fs = require('fs')
-    if (!fs.existsSync(uploadsDir)) {
-      fs.mkdirSync(uploadsDir, { recursive: true })
-    }
-
-    // Write file
-    await writeFile(filePath, buffer)
-
-    // Return the URL path
-    const imageUrl = `/uploads/${filename}`
-    
-    return NextResponse.json({ url: imageUrl })
   } catch (error) {
-    console.error('Upload error:', error)
-    return NextResponse.json({ error: 'Upload failed' }, { status: 500 })
+    console.error('Upload error:', error);
+    return NextResponse.json({ error: 'Upload failed' }, { status: 500 });
   }
 }

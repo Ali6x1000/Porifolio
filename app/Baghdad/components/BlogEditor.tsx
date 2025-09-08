@@ -286,54 +286,42 @@ const [uploadedImages, setUploadedImages] = useState<string[]>([])
 
 // Enhanced handleImageUpload with preview
 // A revised handleImageUpload function for your AdvancedBlogPostForm component
+// In your AdvancedBlogPostForm component
 
 const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
   const file = e.target.files?.[0];
   if (!file) return;
 
-  // 1. Create a unique ID for this specific upload
   const tempId = `uploading-${Date.now()}-${file.name}`;
   const loadingText = `![Uploading ${file.name}...](${tempId})`;
   
-  // 2. Insert the unique placeholder at the cursor position
   insertMarkdown(loadingText + '\n');
   
   try {
-    const uploadFormData = new FormData();
-    uploadFormData.append('file', file);
-
-    const response = await fetch('/api/upload', {
+    // Pass the filename in the URL
+    const response = await fetch(`/api/upload?filename=${file.name}`, {
       method: 'POST',
-      body: uploadFormData,
+      body: file, // Send the file directly as the body
     });
 
     if (!response.ok) {
       throw new Error('Upload failed with status: ' + response.status);
     }
 
-    const { url } = await response.json();
-
-    // 3. Replace the unique placeholder with the final Markdown
+    // The response from Vercel Blob already contains the final URL
+    const newBlob = await response.json();
+    
     setFormData(prev => ({
       ...prev,
-      content: prev.content.replace(loadingText, `![${file.name}](${url})`)
+      content: prev.content.replace(loadingText, `![${file.name}](${newBlob.url})`)
     }));
 
   } catch (error) {
-    console.error('Image upload failed:', error);
-    alert('Failed to upload image. Please try again.');
-    
-    // 4. On error, remove the unique placeholder
-    setFormData(prev => ({
-      ...prev,
-      content: prev.content.replace(loadingText, '')
-    }));
+    // ... (your existing error handling logic) ...
   } finally {
-      // Clear the file input so the user can upload the same file again
       e.target.value = '';
   }
 };
-
 
   const toolbarButtons = [
     { icon: Bold, action: () => insertText('**', '**'), title: 'Bold' },
