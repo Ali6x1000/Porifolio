@@ -36,7 +36,7 @@ npm run dev
 
 ## Deployment
 
-This project can be deployed on Vercel, Netlify, or any platform that supports Next.js.
+This project can be deployed on Vercel, Netlify, or any platform that supports Next.js. I chose Vercel myself.
 
 ## Technologies Used
 
