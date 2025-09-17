@@ -18,7 +18,7 @@ A modern, responsive portfolio website built with Next.js 14, featuring a blog, 
 
 ## Admin Portal
 
-Access the admin portal at `/Baghdad` to manage your portfolio content. The admin panel includes:
+Access the admin portal at `/admin` to manage your portfolio content. The admin panel includes:
 
 ### Blog Editor
 - **Rich Text Toolbar**: Format text with bold, italic, code blocks, lists, and more
@@ -134,7 +134,7 @@ npm run dev
 
 4. Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-5. Access the admin portal at [http://localhost:3000/Baghdad](http://localhost:3000/Baghdad)
+
 
 ## Customization
 
@@ -147,7 +147,7 @@ npm run dev
 ## Content Management Workflow
 
 1. **Creating Blog Posts**:
-   - Navigate to `/Baghdad`
+   - Navigate to `/admin`
    - Click "New Post" in the Blog Posts tab
    - Use the rich text editor with LaTeX support
    - Preview content before publishing
