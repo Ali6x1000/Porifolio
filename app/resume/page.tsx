@@ -119,8 +119,8 @@ export default function Resume() {
               </a>
             </div>
             <a 
-              href="/Nawaf_resume.pdf" 
-              download="AliNawaf_Resume.pdf"
+              href="/Ali_Nawaf_resume.pdf" 
+              download="Ali_Nawaf_Resume.pdf"
               className="btn-primary inline-flex items-center"
             >
               <Download className="mr-2" size={20} />
