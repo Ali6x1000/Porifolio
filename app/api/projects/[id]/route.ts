@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { writeFile, readFile } from 'fs/promises'
-import path from 'path'
+import { put, list, del } from '@vercel/blob'
 
 interface Project {
   id: string
@@ -12,33 +11,42 @@ interface Project {
   image: string
 }
 
-const projectsFilePath = path.join(process.cwd(), 'data', 'projects.json')
+const PROJECTS_BLOB_KEY = 'projects.json'
 
-// Ensure data directory exists
-async function ensureDataDirectory() {
-  const fs = require('fs')
-  const dataDir = path.join(process.cwd(), 'data')
-  if (!fs.existsSync(dataDir)) {
-    fs.mkdirSync(dataDir, { recursive: true })
-  }
-}
-
-// Read projects from file
-async function readProjects(): Promise<Project[]> {
+// Helper function to get projects from Vercel Blob
+async function getProjects(): Promise<Project[]> {
   try {
-    await ensureDataDirectory()
-    const data = await readFile(projectsFilePath, 'utf-8')
-    return JSON.parse(data)
+    const { blobs } = await list({ prefix: PROJECTS_BLOB_KEY })
+    if (blobs.length === 0) {
+      return []
+    }
+    
+    const response = await fetch(blobs[0].url)
+    const projects = await response.json()
+    return Array.isArray(projects) ? projects : []
   } catch (error) {
-    // File doesn't exist or is empty, return empty array
+    console.error('Error fetching projects:', error)
     return []
   }
 }
 
-// Write projects to file
-async function writeProjects(projects: Project[]): Promise<void> {
-  await ensureDataDirectory()
-  await writeFile(projectsFilePath, JSON.stringify(projects, null, 2))
+// Helper function to save projects to Vercel Blob
+async function saveProjects(projects: Project[]): Promise<void> {
+  try {
+    // Delete existing projects blob
+    const { blobs } = await list({ prefix: PROJECTS_BLOB_KEY })
+    for (const blob of blobs) {
+      await del(blob.url)
+    }
+    
+    // Save new projects
+    await put(PROJECTS_BLOB_KEY, JSON.stringify(projects, null, 2), {
+      access: 'public',
+    })
+  } catch (error) {
+    console.error('Error saving projects:', error)
+    throw error
+  }
 }
 
 // DELETE /api/projects/[id]
@@ -54,7 +62,7 @@ export async function DELETE(
     }
 
     // Read existing projects
-    const projects = await readProjects()
+    const projects = await getProjects()
     
     // Find project to delete
     const projectIndex = projects.findIndex(p => p.id === projectId)
@@ -66,8 +74,8 @@ export async function DELETE(
     // Remove project from array
     const deletedProject = projects.splice(projectIndex, 1)[0]
     
-    // Write updated projects back to file
-    await writeProjects(projects)
+    // Save updated projects
+    await saveProjects(projects)
     
     return NextResponse.json({ 
       message: 'Project deleted successfully',
@@ -79,14 +87,14 @@ export async function DELETE(
   }
 }
 
-// GET /api/projects/[id] - Get single project (optional)
+// GET /api/projects/[id] - Get single project
 export async function GET(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
     const projectId = params.id
-    const projects = await readProjects()
+    const projects = await getProjects()
     const project = projects.find(p => p.id === projectId)
     
     if (!project) {
@@ -100,7 +108,7 @@ export async function GET(
   }
 }
 
-// PUT /api/projects/[id] - Update single project (optional)
+// PUT /api/projects/[id] - Update single project
 export async function PUT(
   request: NextRequest,
   { params }: { params: { id: string } }
@@ -109,7 +117,7 @@ export async function PUT(
     const projectId = params.id
     const updatedProject = await request.json()
     
-    const projects = await readProjects()
+    const projects = await getProjects()
     const projectIndex = projects.findIndex(p => p.id === projectId)
     
     if (projectIndex === -1) {
@@ -119,7 +127,7 @@ export async function PUT(
     // Update the project
     projects[projectIndex] = { ...projects[projectIndex], ...updatedProject, id: projectId }
     
-    await writeProjects(projects)
+    await saveProjects(projects)
     
     return NextResponse.json(projects[projectIndex])
   } catch (error) {
