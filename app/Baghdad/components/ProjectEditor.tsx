@@ -222,14 +222,16 @@ function ProjectForm({
         <div>
           <label className="block text-sm font-medium mb-2">Technologies (comma-separated)</label>
           <input
-            type="text"
-            value={formData.technologies.join(', ')}
-            onChange={(e) => setFormData(prev => ({ 
-              ...prev, 
-              technologies: e.target.value.split(',').map(tech => tech.trim()).filter(Boolean)
-            }))}
-            className="w-full p-3 border rounded-lg" required
-          />
+  type="text"
+  value={formData.technologies.join(', ')}
+  onChange={(e) => {
+    const value = e.target.value
+    // Allow typing commas freely, only split on save
+    setFormData(prev => ({ ...prev, technologies: value.split(',').map(t => t.trim()).filter(Boolean) }))
+  }}
+  className="w-full p-3 border rounded-lg"
+/>
+
         </div>
         <div className="grid md:grid-cols-2 gap-6">
           <div>
