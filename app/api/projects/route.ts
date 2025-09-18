@@ -42,7 +42,7 @@ async function saveProjects(projects: Project[]): Promise<void> {
     // Save new projects
     await put(PROJECTS_BLOB_KEY, JSON.stringify(projects, null, 2), {
       access: 'public',
-      allowOverwrite: true,
+      allowOverwrite: true
     })
   } catch (error) {
     console.error('Error saving projects:', error)

@@ -15,6 +15,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     // Upload the file to Vercel Blob
     const blob = await put(filename, request.body, {
       access: 'public', // Make the file publicly accessible
+      allowOverwrite: true, // Allow overwriting existing files
     });
 
     // The 'blob' object contains the final URL
