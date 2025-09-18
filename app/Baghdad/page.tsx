@@ -1,8 +1,8 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, Suspense } from 'react'
 import { motion } from 'framer-motion'
-import { FileText, FolderOpen, User } from 'lucide-react'
+import { FileText, Briefcase, User, UserCircle, FolderOpen } from 'lucide-react'
 import dynamic from 'next/dynamic'
 
 // Dynamically import components to avoid SSR issues
@@ -21,14 +21,50 @@ const ResumeEditor = dynamic(() => import('./components/ResumeEditor'), {
   loading: () => <div className="p-8 bg-white rounded-lg shadow animate-pulse">Loading...</div>
 })
 
+const AboutEditor = dynamic(() => import('./components/AboutEditor'), {
+  loading: () => <div className="p-8 text-center">Loading About Editor...</div>
+})
+
 export default function AdminPanel() {
   const [activeTab, setActiveTab] = useState('blog')
 
   const tabs = [
     { id: 'blog', name: 'Blog Posts', icon: FileText },
-    { id: 'projects', name: 'Projects', icon: FolderOpen },
-    { id: 'resume', name: 'Resume', icon: User },
+    { id: 'projects', name: 'Projects', icon: Briefcase },
+    { id: 'about', name: 'About Me', icon: UserCircle },
+    { id: 'resume', name: 'Resume', icon: User }
   ]
+
+  const renderContent = () => {
+    switch (activeTab) {
+      case 'blog':
+        return (
+          <Suspense fallback={<div className="p-8 text-center">Loading...</div>}>
+            <BlogEditor />
+          </Suspense>
+        )
+      case 'projects':
+        return (
+          <Suspense fallback={<div className="p-8 text-center">Loading...</div>}>
+            <ProjectEditor />
+          </Suspense>
+        )
+      case 'about':
+        return (
+          <Suspense fallback={<div className="p-8 text-center">Loading...</div>}>
+            <AboutEditor />
+          </Suspense>
+        )
+      case 'resume':
+        return (
+          <Suspense fallback={<div className="p-8 text-center">Loading...</div>}>
+            <ResumeEditor />
+          </Suspense>
+        )
+      default:
+        return <div>Select a tab</div>
+    }
+  }
 
   return (
     <div className="pt-16 min-h-screen bg-gray-50">
@@ -72,9 +108,7 @@ export default function AdminPanel() {
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.3 }}
         >
-          {activeTab === 'blog' && <BlogEditor />}
-          {activeTab === 'projects' && <ProjectEditor />}
-          {activeTab === 'resume' && <ResumeEditor />}
+          {renderContent()}
         </motion.div>
       </div>
     </div>

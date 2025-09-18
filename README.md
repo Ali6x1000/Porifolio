@@ -1,6 +1,6 @@
 # CS Portfolio Website
 
-A modern, responsive portfolio website built with Next.js 14, featuring a blog, project showcase, resume section, and a powerful admin portal for content management.
+A modern, responsive portfolio website built with Next.js 14, featuring a blog, project showcase, resume section, about page, and a powerful admin portal for content management.
 
 ## Features
 
@@ -11,6 +11,7 @@ A modern, responsive portfolio website built with Next.js 14, featuring a blog, 
 - 📝 Advanced blog functionality with markdown support
 - 🔬 LaTeX math equation support for research content
 - ⚙️ Complete admin portal for content management
+- 👤 Dynamic About Me page with photo and biography management
 - 🎨 Modern, clean UI design
 - ⚡ Fast loading and optimized performance
 - 📁 File upload system with Vercel Blob storage
@@ -26,6 +27,13 @@ Access the admin portal at `/Baghdad` to manage your portfolio content. The admi
 - **Image Upload**: Direct file upload with automatic URL generation
 - **Live Preview**: Toggle between edit and preview modes
 - **SEO Optimization**: Custom slugs, excerpts, and meta tags
+
+### About Me Editor
+- **Profile Image Management**: Upload and update your profile photo
+- **Personal Information**: Edit name, title, location, and contact details
+- **Biography Sections**: Manage introduction, background, interests, and goals
+- **Statistics Display**: Add custom stats with labels and values
+- **Personal Facts**: Create a list of fun facts about yourself
 
 ### Project Manager
 - Add, edit, and delete projects
@@ -152,12 +160,18 @@ npm run dev
    - Use the rich text editor with LaTeX support
    - Preview content before publishing
 
-2. **Managing Projects**:
+2. **Managing About Content**:
+   - Use the About Me tab in the admin panel
+   - Upload a professional profile photo
+   - Edit biography sections and personal information
+   - Add statistics and fun facts
+
+3. **Managing Projects**:
    - Use the Projects tab in the admin panel
    - Add GitHub links, demo URLs, and technology tags
    - Upload project images directly
 
-3. **Updating Resume**:
+4. **Updating Resume**:
    - Edit experience, education, and skills
    - Changes reflect immediately on the resume page
 
@@ -189,6 +203,8 @@ The project can also be deployed on Netlify or any platform supporting Next.js.
 - `POST /api/posts` - Create/update blog post
 - `GET /api/posts/[slug]` - Fetch single blog post
 - `DELETE /api/posts/[slug]` - Delete blog post
+- `GET /api/about` - Fetch about data
+- `POST /api/about` - Update about data
 - `POST /api/upload` - Upload files to blob storage
 
 ## License
