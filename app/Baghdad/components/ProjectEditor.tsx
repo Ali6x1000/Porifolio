@@ -1,4 +1,3 @@
-// components/ProjectEditor.js
 'use client'
 
 import { useState, useEffect } from 'react'
@@ -151,8 +150,17 @@ function ProjectForm({
   onSave: (project: Project) => void;
   onCancel: () => void;
 }) {
-  const [formData, setFormData] = useState(project);
+  // Keep a full formData object and a separate techInput string so typing commas doesn't
+  // cause cursor jumps or aggressive re-parsing on every keystroke.
+  const [formData, setFormData] = useState<Project>(project);
   const [isUploading, setIsUploading] = useState(false);
+  const [techInput, setTechInput] = useState<string>((project.technologies || []).join(', '))
+
+  // Sync when parent passes a new project (important when editing an existing project)
+  useEffect(() => {
+    setFormData(project)
+    setTechInput((project.technologies || []).join(', '))
+  }, [project])
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -179,7 +187,9 @@ function ProjectForm({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSave(formData);
+    // Convert techInput string into array on save
+    const cleaned = techInput.split(',').map(t => t.trim()).filter(Boolean);
+    onSave({ ...formData, technologies: cleaned });
   };
 
   return (
@@ -222,16 +232,13 @@ function ProjectForm({
         <div>
           <label className="block text-sm font-medium mb-2">Technologies (comma-separated)</label>
           <input
-  type="text"
-  value={formData.technologies.join(', ')}
-  onChange={(e) => {
-    const value = e.target.value
-    // Allow typing commas freely, only split on save
-    setFormData(prev => ({ ...prev, technologies: value.split(',').map(t => t.trim()).filter(Boolean) }))
-  }}
-  className="w-full p-3 border rounded-lg"
-/>
-
+            type="text"
+            value={techInput}
+            onChange={(e) => setTechInput(e.target.value)}
+            placeholder="e.g. React, TypeScript, Tailwind"
+            className="w-full p-3 border rounded-lg" 
+          />
+          <p className="text-xs text-gray-500 mt-1">Separate items with commas (they'll be parsed when you save).</p>
         </div>
         <div className="grid md:grid-cols-2 gap-6">
           <div>
