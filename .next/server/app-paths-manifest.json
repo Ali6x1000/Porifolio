@@ -1,13 +1,15 @@
 {
   "/_not-found/page": "app/_not-found/page.js",
   "/Baghdad/page": "app/Baghdad/page.js",
+  "/api/projects/[id]/route": "app/api/projects/[id]/route.js",
   "/api/posts/route": "app/api/posts/route.js",
   "/api/posts/[slug]/route": "app/api/posts/[slug]/route.js",
+  "/api/projects/route": "app/api/projects/route.js",
+  "/projects/page": "app/projects/page.js",
+  "/blog/page": "app/blog/page.js",
   "/blog/[slug]/page": "app/blog/[slug]/page.js",
   "/page": "app/page.js",
-  "/api/upload/route": "app/api/upload/route.js",
-  "/blog/page": "app/blog/page.js",
+  "/test/page": "app/test/page.js",
   "/resume/page": "app/resume/page.js",
-  "/projects/page": "app/projects/page.js",
-  "/test/page": "app/test/page.js"
+  "/api/upload/route": "app/api/upload/route.js"
 }

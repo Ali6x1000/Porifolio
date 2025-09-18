@@ -1,7 +1,8 @@
+// components/ProjectEditor.js
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Plus, Edit, Trash2, Save } from 'lucide-react'
+import { Plus, Edit, Trash2, Save, Github, ExternalLink, Image as ImageIcon } from 'lucide-react'
 
 interface Project {
   id: string
@@ -16,57 +17,57 @@ interface Project {
 export default function ProjectEditor() {
   const [projects, setProjects] = useState<Project[]>([])
   const [editingProject, setEditingProject] = useState<Project | null>(null)
-  const [isCreating, setIsCreating] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
+
+  const fetchProjects = async () => {
+    setIsLoading(true)
+    try {
+      const response = await fetch('/api/projects')
+      if (!response.ok) throw new Error('Network response was not ok')
+      const data = await response.json()
+      setProjects(Array.isArray(data) ? data : [])
+    } catch (error) {
+      console.error("Failed to fetch projects:", error)
+      setProjects([]) // Set to empty array on error
+    } finally {
+      setIsLoading(false)
+    }
+  }
 
   useEffect(() => {
-    const savedProjects = localStorage.getItem('projects')
-    if (savedProjects) {
-      setProjects(JSON.parse(savedProjects))
-    } else {
-      // Initialize with default projects
-      const defaultProjects: Project[] = [
-        {
-          id: '1',
-          title: 'E-Commerce Platform',
-          description: 'Full-stack e-commerce application with user authentication, payment processing, and admin dashboard.',
-          technologies: ['React', 'Node.js', 'MongoDB', 'Stripe'],
-          github: 'https://github.com/yourusername/ecommerce',
-          demo: 'https://your-ecommerce-demo.com',
-          image: '/api/placeholder/400/250'
-        }
-      ]
-      setProjects(defaultProjects)
-      localStorage.setItem('projects', JSON.stringify(defaultProjects))
-    }
+    fetchProjects()
   }, [])
 
-  const saveProjects = (updatedProjects: Project[]) => {
-    setProjects(updatedProjects)
-    localStorage.setItem('projects', JSON.stringify(updatedProjects))
-  }
-
-  const handleSave = (project: Project) => {
-    if (isCreating) {
-      const newProject = { ...project, id: Date.now().toString() }
-      saveProjects([...projects, newProject])
-      setIsCreating(false)
-    } else {
-      const updatedProjects = projects.map(p => p.id === project.id ? project : p)
-      saveProjects(updatedProjects)
+  const handleSave = async (project: Project) => {
+    try {
+      await fetch('/api/projects', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(project),
+      })
+      setEditingProject(null)
+      fetchProjects() // Refetch to update list
+    } catch (error) {
+      console.error("Failed to save project:", error)
+      alert("Error saving project. See console for details.")
     }
-    setEditingProject(null)
   }
 
-  const handleDelete = (id: string) => {
+  const handleDelete = async (id: string) => {
     if (confirm('Are you sure you want to delete this project?')) {
-      const updatedProjects = projects.filter(p => p.id !== id)
-      saveProjects(updatedProjects)
+      try {
+        await fetch(`/api/projects/${id}`, { method: 'DELETE' })
+        fetchProjects() // Refetch to update list
+      } catch (error) {
+        console.error("Failed to delete project:", error)
+        alert("Error deleting project. See console for details.")
+      }
     }
   }
 
   const createNewProject = () => {
     const newProject: Project = {
-      id: '',
+      id: '', // API will generate ID
       title: '',
       description: '',
       technologies: [],
@@ -75,74 +76,68 @@ export default function ProjectEditor() {
       image: '/api/placeholder/400/250'
     }
     setEditingProject(newProject)
-    setIsCreating(true)
   }
 
   if (editingProject) {
     return <ProjectForm 
       project={editingProject} 
       onSave={handleSave} 
-      onCancel={() => {
-        setEditingProject(null)
-        setIsCreating(false)
-      }} 
+      onCancel={() => setEditingProject(null)} 
     />
   }
 
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold">Projects</h2>
+        <h2 className="text-2xl font-bold">Projects ({projects.length})</h2>
         <button
           onClick={createNewProject}
           className="btn-primary inline-flex items-center gap-2"
         >
-          <Plus size={20} />
-          New Project
+          <Plus size={20} /> New Project
         </button>
       </div>
 
-      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {projects.map((project) => (
-          <div key={project.id} className="card">
-            <div className="h-32 bg-gray-200 rounded-lg mb-4"></div>
-            <h3 className="text-lg font-semibold mb-2">{project.title}</h3>
-            <p className="text-gray-600 text-sm mb-3 line-clamp-3">{project.description}</p>
-            
-            <div className="flex flex-wrap gap-1 mb-3">
-              {project.technologies.slice(0, 3).map((tech) => (
-                <span key={tech} className="bg-primary-100 text-primary-800 px-2 py-1 rounded text-xs">
-                  {tech}
-                </span>
-              ))}
-              {project.technologies.length > 3 && (
-                <span className="text-xs text-gray-500">+{project.technologies.length - 3} more</span>
-              )}
-            </div>
-            
-            <div className="flex justify-between items-center">
-              <div className="flex gap-2 text-xs">
-                <a href={project.github} className="text-primary-600">GitHub</a>
-                {project.demo && <a href={project.demo} className="text-primary-600">Demo</a>}
+      {isLoading ? (
+        <p>Loading projects...</p>
+      ) : projects.length === 0 ? (
+        <div className="text-center py-12">
+          <p className="text-gray-500 mb-4">No projects yet. Create one!</p>
+        </div>
+      ) : (
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {projects.map((project) => (
+            <div key={project.id} className="card flex flex-col">
+              <img 
+                src={project.image} 
+                alt={project.title} 
+                className="h-40 w-full object-cover rounded-t-lg bg-gray-200"
+              />
+              <div className="p-4 flex flex-col flex-grow">
+                <h3 className="text-lg font-semibold mb-2">{project.title}</h3>
+                <p className="text-gray-600 text-sm mb-3 line-clamp-3 flex-grow">{project.description}</p>
+                <div className="flex flex-wrap gap-1 mb-4">
+                  {project.technologies.slice(0, 4).map((tech) => (
+                    <span key={tech} className="bg-primary-100 text-primary-800 px-2 py-1 rounded text-xs">
+                      {tech}
+                    </span>
+                  ))}
+                </div>
+                <div className="flex justify-between items-center mt-auto">
+                  <div className="flex gap-4 text-gray-600">
+                    <a href={project.github} target="_blank" rel="noopener noreferrer" title="GitHub" className="hover:text-primary-600"><Github size={20} /></a>
+                    {project.demo && <a href={project.demo} target="_blank" rel="noopener noreferrer" title="Live Demo" className="hover:text-primary-600"><ExternalLink size={20} /></a>}
+                  </div>
+                  <div className="flex gap-1">
+                    <button onClick={() => setEditingProject(project)} className="p-1 hover:text-primary-600 rounded"><Edit size={16} /></button>
+                    <button onClick={() => handleDelete(project.id)} className="p-1 hover:text-red-600 rounded"><Trash2 size={16} /></button>
+                  </div>
+                </div>
               </div>
-              <div className="flex gap-1">
-                <button
-                  onClick={() => setEditingProject(project)}
-                  className="p-1 text-gray-600 hover:text-primary-600 rounded"
-                >
-                  <Edit size={16} />
-                </button>
-                <button
-                  onClick={() => handleDelete(project.id)}
-                  className="p-1 text-gray-600 hover:text-red-600 rounded"
-                >
-                  <Trash2 size={16} />
-                </button>
-              </div>
             </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
     </div>
   )
 }
@@ -152,57 +147,78 @@ function ProjectForm({
   onSave, 
   onCancel 
 }: { 
-  project: Project
-  onSave: (project: Project) => void
-  onCancel: () => void 
+  project: Project;
+  onSave: (project: Project) => void;
+  onCancel: () => void;
 }) {
-  const [formData, setFormData] = useState(project)
+  const [formData, setFormData] = useState(project);
+  const [isUploading, setIsUploading] = useState(false);
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setIsUploading(true);
+    try {
+      const response = await fetch(`/api/upload?filename=${file.name}`, {
+        method: 'POST',
+        body: file,
+      });
+
+      if (!response.ok) throw new Error('Upload failed');
+
+      const newBlob = await response.json();
+      setFormData(prev => ({ ...prev, image: newBlob.url }));
+    } catch (error) {
+      console.error(error);
+      alert('Image upload failed!');
+    } finally {
+      setIsUploading(false);
+    }
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    onSave(formData)
-  }
+    e.preventDefault();
+    onSave(formData);
+  };
 
   return (
     <div className="max-w-4xl">
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold">
-          {project.id ? 'Edit Project' : 'Create New Project'}
-        </h2>
-        <div className="flex gap-2">
-          <button onClick={onCancel} className="btn-secondary">
-            Cancel
-          </button>
-          <button onClick={handleSubmit} className="btn-primary inline-flex items-center gap-2">
-            <Save size={18} />
-            Save
-          </button>
-        </div>
-      </div>
-
+      <h2 className="text-2xl font-bold mb-6">
+        {project.id ? 'Edit Project' : 'Create New Project'}
+      </h2>
       <form onSubmit={handleSubmit} className="space-y-6">
+        {/* Image Uploader */}
+        <div>
+          <label className="block text-sm font-medium mb-2">Project Image</label>
+          <div className="flex items-center gap-4">
+            <img src={formData.image} alt="Project" className="w-32 h-20 object-cover rounded-lg bg-gray-200"/>
+            <label className="btn-secondary cursor-pointer">
+              <span>{isUploading ? 'Uploading...' : 'Upload Image'}</span>
+              <input type="file" accept="image/*" onChange={handleImageUpload} className="hidden" disabled={isUploading}/>
+            </label>
+          </div>
+        </div>
+
+        {/* Other Fields... */}
         <div>
           <label className="block text-sm font-medium mb-2">Project Title</label>
           <input
             type="text"
             value={formData.title}
             onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
-            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-            required
+            className="w-full p-3 border rounded-lg" required
           />
         </div>
-
         <div>
           <label className="block text-sm font-medium mb-2">Description</label>
           <textarea
             value={formData.description}
             onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
             rows={4}
-            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-            required
+            className="w-full p-3 border rounded-lg" required
           />
         </div>
-
         <div>
           <label className="block text-sm font-medium mb-2">Technologies (comma-separated)</label>
           <input
@@ -212,12 +228,9 @@ function ProjectForm({
               ...prev, 
               technologies: e.target.value.split(',').map(tech => tech.trim()).filter(Boolean)
             }))}
-            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-            placeholder="React, Node.js, MongoDB"
-            required
+            className="w-full p-3 border rounded-lg" required
           />
         </div>
-
         <div className="grid md:grid-cols-2 gap-6">
           <div>
             <label className="block text-sm font-medium mb-2">GitHub URL</label>
@@ -225,8 +238,7 @@ function ProjectForm({
               type="url"
               value={formData.github}
               onChange={(e) => setFormData(prev => ({ ...prev, github: e.target.value }))}
-              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-              required
+              className="w-full p-3 border rounded-lg" required
             />
           </div>
           <div>
@@ -235,20 +247,13 @@ function ProjectForm({
               type="url"
               value={formData.demo || ''}
               onChange={(e) => setFormData(prev => ({ ...prev, demo: e.target.value || null }))}
-              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+              className="w-full p-3 border rounded-lg"
             />
           </div>
         </div>
-
-        <div>
-          <label className="block text-sm font-medium mb-2">Image URL</label>
-          <input
-            type="url"
-            value={formData.image}
-            onChange={(e) => setFormData(prev => ({ ...prev, image: e.target.value }))}
-            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-            placeholder="/api/placeholder/400/250"
-          />
+        <div className="flex justify-end gap-4">
+          <button type="button" onClick={onCancel} className="btn-secondary">Cancel</button>
+          <button type="submit" className="btn-primary inline-flex items-center gap-2"><Save size={18} /> Save</button>
         </div>
       </form>
     </div>

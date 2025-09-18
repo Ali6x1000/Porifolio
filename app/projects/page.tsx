@@ -3,17 +3,31 @@
 import { motion } from 'framer-motion'
 import { Github, ExternalLink, Code } from 'lucide-react'
 import { useState, useEffect } from 'react'
+import dynamic from 'next/dynamic'
 
-export default function Projects() {
-  const [projects, setProjects] = useState<any[]>([])
+// Define the interface
+interface Project {
+  title: string
+  description: string
+  technologies: string[]
+  github: string
+  demo: string | null
+  image: string
+}
+
+function ProjectsContent() {
+  const [projects, setProjects] = useState<Project[]>([])
+  const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
+    setMounted(true)
+    
     const savedProjects = localStorage.getItem('projects')
     if (savedProjects) {
       setProjects(JSON.parse(savedProjects))
     } else {
       // Default projects if none saved
-      const defaultProjects = [
+      const defaultProjects: Project[] = [
         {
           title: 'E-Commerce Platform',
           description: 'Full-stack e-commerce application with user authentication, payment processing, and admin dashboard.',
@@ -66,6 +80,24 @@ export default function Projects() {
       setProjects(defaultProjects)
     }
   }, [])
+
+  // Don't render anything until the component has mounted on the client
+  if (!mounted) {
+    return (
+      <div className="pt-16">
+        <section className="section-padding">
+          <div className="max-w-7xl mx-auto">
+            <div className="text-center mb-12">
+              <h1 className="text-4xl font-bold mb-4">My Projects</h1>
+              <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+                Loading projects...
+              </p>
+            </div>
+          </div>
+        </section>
+      </div>
+    )
+  }
 
   return (
     <div className="pt-16">
@@ -142,3 +174,20 @@ export default function Projects() {
     </div>
   )
 }
+
+// Use dynamic import to disable SSR for this component
+const Projects = dynamic(() => Promise.resolve(ProjectsContent), {
+  ssr: false,
+  loading: () => (
+    <div className="pt-16">
+      <section className="section-padding">
+        <div className="max-w-7xl mx-auto text-center">
+          <div className="animate-spin w-8 h-8 border-2 border-primary-600 border-t-transparent rounded-full mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading projects...</p>
+        </div>
+      </section>
+    </div>
+  )
+})
+
+export default Projects
