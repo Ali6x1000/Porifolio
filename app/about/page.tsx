@@ -26,7 +26,7 @@ interface AboutData {
 }
 
 const defaultAboutData: AboutData = {
-  profileImage: '/placeholder-avatar.jpg',
+  profileImage: './placeholder-avatar.jpg',
   name: 'Ali Nawaf',
   title: 'Computer Science Student & Developer',
   location: 'Cleveland, OH',
@@ -39,14 +39,14 @@ const defaultAboutData: AboutData = {
     goals: "My goal is to leverage technology to create meaningful impact in the world"
   },
   stats: [
-    
+    {label : 'Industry experience' , value: '1 year +'},
     { label: 'ML Models Used', value: 'RESNETs, CNN , YOLO , VAEs' },
     { label: 'Area of Interest', value: 'Machine Learning' },
     { label: 'Coffee Cups', value: '∞' }
   ],
   personalFacts: [
     'I went to India for highschool',
-    'I was a biochem pre med major still passionate for medicine and health tho',
+    'I was a biochem pre med major still passionate for medicine and health',
     'I love coffee chats',
     'I am Bilingiual Arabic + English',
     'I have 700 liked spotify songs '
