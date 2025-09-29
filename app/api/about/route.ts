@@ -1,16 +1,73 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { put, list } from '@vercel/blob'
 
+interface AboutData {
+  profileImage: string
+  name: string
+  title: string
+  location: string
+  email: string
+  phone: string
+  bio: {
+    introduction: string
+    background: string
+    interests: string
+    goals: string
+  }
+  stats: {
+    label: string
+    value: string
+  }[]
+  personalFacts: string[]
+}
+
+const ABOUT_BLOB_KEY = 'about.json'
+
+// Helper function to get about data from Vercel Blob
+async function getAboutData(): Promise<AboutData | null> {
+  try {
+    const { blobs } = await list({ prefix: ABOUT_BLOB_KEY })
+    if (blobs.length === 0) {
+      return null
+    }
+    
+    const response = await fetch(blobs[0].url)
+    const aboutData = await response.json()
+    return aboutData
+  } catch (error) {
+    console.error('Error fetching about data:', error)
+    return null
+  }
+}
+
+// Helper function to save about data to Vercel Blob
+async function saveAboutData(aboutData: AboutData): Promise<void> {
+  try {
+    // Delete existing about blob
+    const { blobs } = await list({ prefix: ABOUT_BLOB_KEY })
+    for (const blob of blobs) {
+      const { del } = await import('@vercel/blob')
+      await del(blob.url)
+    }
+    
+    // Save new about data
+    await put(ABOUT_BLOB_KEY, JSON.stringify(aboutData, null, 2), {
+      access: 'public',
+    })
+  } catch (error) {
+    console.error('Error saving about data:', error)
+    throw error
+  }
+}
+
+// GET /api/about
 export async function GET() {
   try {
-    const { blobs } = await list({
-      prefix: 'about/',
-      limit: 1
-    })
-
-    if (blobs.length === 0) {
-      // Return default data if no about data exists
-      const defaultData = {
+    const aboutData = await getAboutData()
+    
+    if (!aboutData) {
+      // Return default data if none exists
+      const defaultData: AboutData = {
         profileImage: '/placeholder-avatar.jpg',
         name: 'Ali Nawaf',
         title: 'Computer Science Student & Developer',
@@ -18,63 +75,43 @@ export async function GET() {
         email: 'aan90@case.edu',
         phone: '+1 (216) 647-4302',
         bio: {
-          introduction: "Hello! I'm Ali, a passionate Computer Science student with a love for creating innovative solutions and building impactful software applications.",
-          background: "Currently pursuing my degree in Computer Science, I've developed a strong foundation in programming, algorithms, and software engineering principles. My journey in tech started with curiosity and has evolved into a genuine passion for problem-solving.",
-          interests: "When I'm not coding, I enjoy exploring new technologies, contributing to open-source projects, and staying up-to-date with the latest trends in web development and artificial intelligence.",
-          goals: "My goal is to leverage technology to create meaningful solutions that make a positive impact on people's lives. I'm always eager to learn new skills and take on challenging projects."
+          introduction: "Hello! I'm Ali, Junior at Case Western Reserve University in the BS/MS program. My thesis is in Machine Learning.",
+          background: "I have experience in SWE, ML, Computer Vision and I am trying to expand into more fields like Privacy and biotech",
+          interests: "When I'm not coding, I enjoy exploring nature, going on hikes, doing sports or socializing in cafes.",
+          goals: "My goal is to leverage technology to create meaningful impact in the world"
         },
         stats: [
-          { label: 'Projects Completed', value: '20+' },
-          { label: 'Technologies Used', value: '15+' },
-          { label: 'Years of Experience', value: '3+' },
+          {label : 'Industry experience' , value: '1 year +'},
+          { label: 'ML Models Used', value: 'RESNETs, CNN, YOLO, VAEs' },
+          { label: 'Area of Interest', value: 'Machine Learning' },
           { label: 'Coffee Cups', value: '∞' }
         ],
         personalFacts: [
-          'I started programming when I was 16',
-          'I love solving algorithmic challenges',
-          'I enjoy mentoring fellow students',
-          'I speak three languages fluently'
+          'I went to India for high school',
+          'I was a biochem pre med major still passionate for medicine and health',
+          'I love coffee chats',
+          'I am Bilingual Arabic + English',
+          'I have 700 liked spotify songs'
         ]
       }
       return NextResponse.json(defaultData)
     }
-
-    const aboutBlob = blobs[0]
-    const response = await fetch(aboutBlob.url)
-    const aboutData = await response.json()
-
+    
     return NextResponse.json(aboutData)
   } catch (error) {
-    console.error('Error fetching about data:', error)
-    return NextResponse.json(
-      { error: 'Failed to fetch about data' },
-      { status: 500 }
-    )
+    console.error('Get about data error:', error)
+    return NextResponse.json({ error: 'Failed to fetch about data' }, { status: 500 })
   }
 }
 
+// POST /api/about - Update about data
 export async function POST(request: NextRequest) {
   try {
     const aboutData = await request.json()
-
-    const blob = await put(
-      'about/data.json',
-      JSON.stringify(aboutData, null, 2),
-      {
-        access: 'public',
-        contentType: 'application/json',
-      }
-    )
-
-    return NextResponse.json({ 
-      message: 'About data updated successfully',
-      url: blob.url 
-    })
+    await saveAboutData(aboutData)
+    return NextResponse.json(aboutData)
   } catch (error) {
-    console.error('Error updating about data:', error)
-    return NextResponse.json(
-      { error: 'Failed to update about data' },
-      { status: 500 }
-    )
+    console.error('Save about data error:', error)
+    return NextResponse.json({ error: 'Failed to save about data' }, { status: 500 })
   }
 }
