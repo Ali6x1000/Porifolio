@@ -359,11 +359,11 @@ export default function AboutEditor() {
                 placeholder="Value"
                 value={stat.value}
                 onChange={(e) => updateStat(index, 'value', e.target.value)}
-                className="flex-1 border rounded-lg px-3 py-2"
+                className="w-24 border rounded-lg px-3 py-2"
               />
               <button
                 onClick={() => removeStat(index)}
-                className="text-red-600 hover:text-red-800 flex-shrink-0"
+                className="text-red-600 hover:text-red-800"
               >
                 <Trash2 size={16} />
               </button>

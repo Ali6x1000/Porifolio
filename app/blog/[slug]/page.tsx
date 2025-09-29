@@ -1,68 +1,38 @@
-import { Suspense } from 'react'
-import { notFound } from 'next/navigation'
-import PostContent from './components/PostContent'
+import { notFound } from 'next/navigation';
+import PostContent from './PostContent'; // Import the new Client Component
 
-interface Post {
-  slug: string
-  title: string
-  content: string
-  excerpt: string
-  date: string
-  tags: string[]
-  featuredImage?: string
-  readTime: number
+// Define the BlogPost interface here
+interface BlogPost {
+  id: string; title: string; excerpt: string; date: string; readTime: string; slug: string; tags: string[]; content: string; featuredImage?: string;
 }
 
-async function getPost(slug: string): Promise<Post | null> {
-  try {
-    const baseUrl = process.env.NODE_ENV === 'production' 
-      ? 'https://www.alinawaf.com' 
-      : 'http://localhost:3000'
-    
-    const response = await fetch(`${baseUrl}/api/posts/${slug}`, {
-      cache: 'no-store'
-    })
-    
-    if (!response.ok) {
-      return null
+// This function fetches data on the server
+async function getPost(slug: string): Promise<BlogPost | null> {
+    try {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/posts/${slug}`, {
+            cache: 'no-store'
+        });
+        if (!res.ok) return null;
+        return res.json();
+    } catch (error) {
+        console.error("Error fetching post:", error);
+        return null;
     }
-    
-    return await response.json()
-  } catch (error) {
-    console.error('Failed to fetch post:', error)
-    return null
-  }
 }
 
-export async function generateMetadata({ params }: { params: { slug: string } }) {
-  const post = await getPost(params.slug)
-  
-  if (!post) {
-    return {
-      title: 'Post Not Found',
-    }
-  }
-
-  return {
-    title: `${post.title} - Ali Nawaf`,
-    description: post.excerpt,
-  }
-}
-
-export default async function BlogPost({ params }: { params: { slug: string } }) {
-  const post = await getPost(params.slug)
+// This is the async Server Component
+export default async function BlogPostPage({ params }: { params: { slug: string } }) {
+  const post = await getPost(params.slug);
 
   if (!post) {
-    notFound()
+    notFound();
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary-50 to-secondary-50 py-20">
-      <div className="max-w-4xl mx-auto px-4">
-        <Suspense fallback={<div className="text-center">Loading post...</div>}>
-          <PostContent post={post} />
-        </Suspense>
+    <article className="min-h-screen bg-white">
+      <div className="max-w-4xl mx-auto px-4 py-8">
+        <PostContent post={post} />
       </div>
-    </div>
-  )
+    </article>
+  );
 }

@@ -162,7 +162,7 @@ export default function About() {
           initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16"
+          className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-16"
         >
           {aboutData.stats.map((stat, index) => (
             <motion.div
@@ -172,7 +172,7 @@ export default function About() {
               transition={{ duration: 0.5, delay: index * 0.1 }}
               className="bg-white rounded-xl p-6 text-center shadow-lg hover:shadow-xl transition-shadow"
             >
-              <div className="text-lg md:text-xl font-bold text-primary-600 mb-2 break-words">
+              <div className="text-2xl md:text-3xl font-bold text-primary-600 mb-2">
                 {stat.value}
               </div>
               <div className="text-gray-600 text-sm">{stat.label}</div>
