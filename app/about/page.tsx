@@ -33,10 +33,10 @@ const defaultAboutData: AboutData = {
   email: 'aan90@case.edu',
   phone: '+1 (216) 647-4302',
   bio: {
-    introduction: "Hello! I'm Ali, a passionate Computer Science student with a love for creating innovative solutions and building impactful software applications.",
-    background: "Currently pursuing my degree in Computer Science, I've developed a strong foundation in programming, algorithms, and software engineering principles. My journey in tech started with curiosity and has evolved into a genuine passion for problem-solving.",
-    interests: "When I'm not coding, I enjoy exploring new technologies, contributing to open-source projects, and staying up-to-date with the latest trends in web development and artificial intelligence.",
-    goals: "My goal is to leverage technology to create meaningful solutions that make a positive impact on people's lives. I'm always eager to learn new skills and take on challenging projects."
+    introduction: "Hello! I'm Ali, Junior at Case Western Reserve University in the BS/MS programm my thesis is in Machine Learning.",
+    background: "I have experience in SWE , ML , Computer Vision and I am trying to expand into more fields like Privacy and biotech",
+    interests: "When I'm not coding, I enjoy exploring nature , going on hikes , doing sports or socializing in cafes.",
+    goals: "My goal is to leverage technology to create meaningful impact in the world"
   },
   stats: [
     
