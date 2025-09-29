@@ -39,16 +39,17 @@ const defaultAboutData: AboutData = {
     goals: "My goal is to leverage technology to create meaningful solutions that make a positive impact on people's lives. I'm always eager to learn new skills and take on challenging projects."
   },
   stats: [
-    { label: 'Projects Completed', value: '20+' },
-    { label: 'Technologies Used', value: '15+' },
-    { label: 'Years of Experience', value: '3+' },
+    
+    { label: 'ML Models Used', value: 'RESNETs, CNN , YOLO , VAEs' },
+    { label: 'Area of Interest', value: 'Machine Learning' },
     { label: 'Coffee Cups', value: '∞' }
   ],
   personalFacts: [
-    'I started programming when I was 16',
-    'I love solving algorithmic challenges',
-    'I enjoy mentoring fellow students',
-    'I speak three languages fluently'
+    'I went to India for highschool',
+    'I was a biochem pre med major still passionate for medicine and health tho',
+    'I love coffee chats',
+    'I am Bilingiual Arabic + English',
+    'I have 700 liked spotify songs '
   ]
 }
 
