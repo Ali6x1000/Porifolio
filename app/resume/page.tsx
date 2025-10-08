@@ -120,7 +120,7 @@ export default function Resume() {
             </div>
             <a 
               href="/Ali_Nawaf_resume.pdf" 
-              download="Ali_Nawaf_Resume.pdf"
+              download="Ali_Nawaf_resume.pdf"
               className="btn-primary inline-flex items-center"
             >
               <Download className="mr-2" size={20} />
