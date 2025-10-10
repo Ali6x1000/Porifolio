@@ -5,8 +5,20 @@ import Link from 'next/link'
 import { ArrowRight, Code, Database, Globe, Github, ExternalLink } from 'lucide-react'
 import { useState, useEffect } from 'react'
 
+// Add the Project interface to match the projects page
+interface Project {
+  id: string
+  title: string
+  description: string
+  technologies: string[]
+  github: string
+  demo: string | null
+  image: string
+}
+
 export default function Home() {
-  const [featuredProjects, setFeaturedProjects] = useState<any[]>([])
+  const [featuredProjects, setFeaturedProjects] = useState<Project[]>([])
+  const [loading, setLoading] = useState(true)
 
   const skills = [
     { icon: Code, name: 'Programming', desc: 'JavaScript, Python, Java, C++' },
@@ -15,42 +27,59 @@ export default function Home() {
   ]
 
   useEffect(() => {
-    // Get projects from localStorage and take first 3 as featured
-    const savedProjects = localStorage.getItem('projects')
-    if (savedProjects) {
-      const projects = JSON.parse(savedProjects)
-      setFeaturedProjects(projects.slice(0, 3))
-    } else {
-      // Default featured projects if none saved
-      const defaultProjects = [
-        {
-          id: '1',
-          title: 'Computer Vision SmartLabeler',
-          description: 'Built an interface on top of Label-Studio to automate annotations, reducing cost and manpower for labeling images.',
-          technologies: ['PyTorch', 'Python', 'Docker', 'API'],
-          github: 'https://github.com/alinawaf/smartlabeler',
-          demo: null,
-        },
-        {
-          id: '2',
-          title: 'ElectroVector App',
-          description: 'Data analytics Swift + Python app converting ECGs into vectorcardiograms, extracting clinically meaningful metrics.',
-          technologies: ['Swift', 'Python', 'API', 'Healthcare'],
-          github: 'https://github.com/alinawaf/electrovector',
-          demo: null,
-        },
-        {
-          id: '3',
-          title: 'Hockey Analytics ML',
-          description: 'Computer vision models for real-time video analysis, achieving 3× accuracy gains and faster inference speed.',
-          technologies: ['PyTorch', 'TensorFlow', 'iOS', 'ML'],
-          github: 'https://github.com/alinawaf/hockey-ml',
-          demo: null,
-        }
-      ]
-      setFeaturedProjects(defaultProjects)
-    }
+    fetchFeaturedProjects()
   }, [])
+
+  const fetchFeaturedProjects = async () => {
+    setLoading(true)
+    try {
+      const response = await fetch('/api/projects')
+      if (response.ok) {
+        const data = await response.json()
+        const projects = Array.isArray(data) ? data : []
+        // Get the most recent 3 projects
+        setFeaturedProjects(projects.slice(0, 3))
+      } else {
+        // Fallback to default projects if API fails
+        setFeaturedProjects(getDefaultProjects())
+      }
+    } catch (error) {
+      console.error('Failed to fetch featured projects:', error)
+      setFeaturedProjects(getDefaultProjects())
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const getDefaultProjects = (): Project[] => [
+    {
+      id: '1',
+      title: 'Computer Vision SmartLabeler',
+      description: 'Built an interface on top of Label-Studio to automate annotations, reducing cost and manpower for labeling images.',
+      technologies: ['PyTorch', 'Python', 'Docker', 'API'],
+      github: 'https://github.com/alinawaf/smartlabeler',
+      demo: null,
+      image: '/api/placeholder/400/250'
+    },
+    {
+      id: '2',
+      title: 'ElectroVector App',
+      description: 'Data analytics Swift + Python app converting ECGs into vectorcardiograms, extracting clinically meaningful metrics.',
+      technologies: ['Swift', 'Python', 'API', 'Healthcare'],
+      github: 'https://github.com/alinawaf/electrovector',
+      demo: null,
+      image: '/api/placeholder/400/250'
+    },
+    {
+      id: '3',
+      title: 'Hockey Analytics ML',
+      description: 'Computer vision models for real-time video analysis, achieving 3× accuracy gains and faster inference speed.',
+      technologies: ['PyTorch', 'TensorFlow', 'iOS', 'ML'],
+      github: 'https://github.com/alinawaf/hockey-ml',
+      demo: null,
+      image: '/api/placeholder/400/250'
+    }
+  ]
 
   return (
     <div className="pt-16">
@@ -125,67 +154,93 @@ export default function Home() {
             <p className="text-gray-600">Check out some of my recent work</p>
           </div>
           
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-8">
-            {featuredProjects.map((project, index) => (
-              <motion.div
-                key={project.id || index}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: index * 0.1 }}
-                className="card group hover:scale-105 transition-transform duration-300"
-              >
-                <div className="h-48 bg-gradient-to-br from-primary-100 to-primary-200 rounded-lg mb-4 flex items-center justify-center">
-                  <Code className="text-primary-600" size={48} />
-                </div>
-                
-                <h3 className="text-xl font-semibold mb-2">{project.title}</h3>
-                <p className="text-gray-600 mb-4 line-clamp-3">
-                  {project.description}
-                </p>
-                
-                <div className="flex flex-wrap gap-2 mb-4">
-                  {project.technologies.slice(0, 3).map((tech: string) => (
-                    <span
-                      key={tech}
-                      className="bg-primary-100 text-primary-800 px-2 py-1 rounded text-sm"
-                    >
-                      {tech}
-                    </span>
-                  ))}
-                  {project.technologies.length > 3 && (
-                    <span className="text-sm text-gray-500">
-                      +{project.technologies.length - 3} more
-                    </span>
-                  )}
-                </div>
-                
-                <div className="flex gap-3">
-                  {project.github && (
-                    <a
-                      href={project.github}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center gap-2 text-gray-600 hover:text-primary-600 transition-colors text-sm"
-                    >
-                      <Github size={16} />
-                      Code
-                    </a>
-                  )}
-                  {project.demo && (
-                    <a
-                      href={project.demo}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center gap-2 text-gray-600 hover:text-primary-600 transition-colors text-sm"
-                    >
-                      <ExternalLink size={16} />
-                      Demo
-                    </a>
-                  )}
-                </div>
-              </motion.div>
-            ))}
-          </div>
+          {loading ? (
+            <div className="text-center py-12">
+              <div className="animate-spin w-8 h-8 border-2 border-primary-600 border-t-transparent rounded-full mx-auto mb-4"></div>
+              <p className="text-gray-600">Loading projects...</p>
+            </div>
+          ) : featuredProjects.length === 0 ? (
+            <div className="text-center py-12">
+              <p className="text-gray-500 text-lg">No projects available yet.</p>
+            </div>
+          ) : (
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-8">
+              {featuredProjects.map((project, index) => (
+                <motion.div
+                  key={project.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, delay: index * 0.1 }}
+                  className="card group hover:scale-105 transition-transform duration-300"
+                >
+                  <div className="h-48 bg-gradient-to-br from-primary-100 to-primary-200 rounded-lg mb-4 flex items-center justify-center overflow-hidden">
+                    {project.image && project.image !== '/api/placeholder/400/250' ? (
+                      <img
+                        src={project.image}
+                        alt={project.title}
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).style.display = 'none'
+                          const parent = (e.target as HTMLImageElement).parentElement
+                          if (parent) {
+                            parent.innerHTML = '<div class="flex items-center justify-center w-full h-full"><svg class="text-primary-600" width="48" height="48" fill="currentColor" viewBox="0 0 24 24"><path d="M9.4 16.6L4.8 12l4.6-4.6L8 6l-6 6 6 6 1.4-1.4zm5.2 0L19.2 12l-4.6-4.6L16 6l6 6-6 6-1.4-1.4z"/></svg></div>'
+                          }
+                        }}
+                      />
+                    ) : (
+                      <Code className="text-primary-600" size={48} />
+                    )}
+                  </div>
+                  
+                  <h3 className="text-xl font-semibold mb-2">{project.title}</h3>
+                  <p className="text-gray-600 mb-4 line-clamp-3">
+                    {project.description}
+                  </p>
+                  
+                  <div className="flex flex-wrap gap-2 mb-4">
+                    {project.technologies.slice(0, 3).map((tech: string) => (
+                      <span
+                        key={tech}
+                        className="bg-primary-100 text-primary-800 px-2 py-1 rounded text-sm"
+                      >
+                        {tech}
+                      </span>
+                    ))}
+                    {project.technologies.length > 3 && (
+                      <span className="text-sm text-gray-500">
+                        +{project.technologies.length - 3} more
+                      </span>
+                    )}
+                  </div>
+                  
+                  <div className="flex gap-3">
+                    {project.github && (
+                      <a
+                        href={project.github}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-2 text-gray-600 hover:text-primary-600 transition-colors text-sm"
+                      >
+                        <Github size={16} />
+                        Code
+                      </a>
+                    )}
+                    {project.demo && (
+                      <a
+                        href={project.demo}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-2 text-gray-600 hover:text-primary-600 transition-colors text-sm"
+                      >
+                        <ExternalLink size={16} />
+                        Demo
+                      </a>
+                    )}
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          )}
           
           <div className="text-center">
             <Link href="/projects" className="btn-primary">
