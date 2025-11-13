@@ -6,11 +6,14 @@ import { Download, Mail, Phone, MapPin, ExternalLink } from 'lucide-react'
 export default function Resume() {
   const experiences = [
     {
-      title: 'Researcher',
+      title: 'Machine Learning Research Assistant',
       company: 'Houston Methodist Hospital',
-      period: 'Aug 2025 – Present',
+      period: 'Aug 2023 – Present',
       description: [
-        'Collaborating with Houston Methodist Hospital’s computational team to build AI-powered CT scan analysis models, predicting cardiovascular disease risk in high-risk patients.'
+        'Achieved >90% accuracy in cardiovascular risk prediction by developing and training a ResNet-based CNN model on medical CT scan images.',
+        'Engineered a signal processing pipeline to digitize raw ECG signals from 10,000+ patient records, enhancing signal fidelity for downstream ML analysis.',
+        'Conducted a comparative analysis of SOTA deep learning architectures (e.g., ResNet, VGG) for cardiovascular risk, benchmarking accuracy and computational cost.',
+        'Ensured 100% compliance with patient data privacy standards (HIPAA) by developing data anonymization scripts during the ECG signal processing pipeline.'
       ]
     },
     {
@@ -35,8 +38,8 @@ export default function Resume() {
       company: 'Eaton',
       period: 'Jan 2025 – May 2025',
       description: [
-        'Built an automated ETL Azure data pipeline to process customer-service data from Salesforce, delivering Business Intelligence insights via Tableau dashboards.',
-        'Optimized business analytics throughput with batch jobs, handling thousands of inputs at lower latency and cost.',
+        'Engineered and deployed a fully automated data pipeline on Microsoft Azure, processing over 100,000 Salesforce records monthly and cutting data processing latency by 35%.',
+        'Led the team to present project results, metrics, and documentation to supervisors and non-technical leadership, resulting in the adoption of new data-driven dashboards.',
         'Implemented role-based access control (RBAC), strengthening access control and reducing security risk.'
       ]
     },
@@ -45,10 +48,10 @@ export default function Resume() {
       company: 'Heads-up Hockey',
       period: 'Dec 2024 – Aug 2025',
       description: [
-        'Automated dataset annotation pipeline, reducing training time by ~67% and cutting compute costs significantly.',
-        'Trained computer-vision models in PyTorch and TensorFlow; achieved ~3× accuracy gains and ~3× faster inference speed, enabling real-time video analysis.',
-        'Built an on-device iOS ML system that detects and extracts high-velocity shots on goal using only the camera.',
-        'Built an interactive Swift-based game integrating responsive front-end design with optimized back-end logic.'
+        'Implemented an interactive Swift-based iOS application, integrating a Core-ML model for efficient on-device inference which improved user retention by 63%.',
+        'Optimized the Core-ML model for on-device performance by applying 16-bit float quantization, reducing model size by 50% and improving battery-life efficiency.',
+        'Leveraged the Core-ML framework to accelerate the model on Apple\'s SOC hardware (Neural Engine), achieving real-time inference.',
+        'Automated a computer vision data annotation pipeline using Kubernetes, reducing manual data preparation time by 70% and accelerating model training cycles.'
       ]
     },
      {
@@ -73,18 +76,25 @@ export default function Resume() {
 
   const projects = [
     {
-      title: 'Computer Vision SmartLabeler',
-      tech: 'Pytorch, Python, Systems Design, API, Git, GitHub, Docker',
+      title: 'Medical Smart Labeler',
+      tech: 'PyTorch, Python, API, Docker, YOLOv10',
       description: [
-        'Built an interface on top of the popular open source tool Label-Studio to automate annotations, lowering cost and manpower required for labeling images.',
-        'Architected project with modular systems design, containerized via Docker for reproducibility.'
+        'Reduced manual image annotation time by 60% by developing a Python tool that integrated with the Label-Studio API to pre-label images using a fine-tuned YOLOv10 model.',
+        'Analyzed and pruned redundant layers from the YOLOv10 model, reducing computational complexity and inference latency by 30% for the real-time pre-labeling tool.'
       ]
     },
     {
       title: 'ElectroVector App',
-      tech: 'Swift, Python, Git, GitHub, API',
+      tech: 'Swift, Python, API, Signal Processing',
       description: [
-        'Developed ElectroVector, a data analytics Swift + Python app converting ECGs into vectorcardiograms, extracting clinically meaningful metrics for medical staff.'
+        'Empowered medical staff with faster diagnostic insights by developing an iOS app that transforms raw ECG signals into clinical Vectorcardiograms, automatically extracting 5+ key cardiac risk metrics.'
+      ]
+    },
+    {
+      title: 'Generative ECG Models',
+      tech: 'PyTorch, VAEs, Signal Processing',
+      description: [
+        'Investigated generative modeling techniques by implementing a Variational Autoencoder (VAE) in PyTorch to learn latent representations of ECG waveforms for synthetic data augmentation.'
       ]
     }
   ]
@@ -211,20 +221,16 @@ export default function Resume() {
             </h2>
             <div className="grid md:grid-cols-2 gap-6">
               <div>
-                <h3 className="font-semibold mb-2">Programming Languages</h3>
-                <p className="text-gray-700">HTML, C++, C, Swift, JavaScript, SQL, R, MySQL</p>
+                <h3 className="font-semibold mb-2">Languages</h3>
+                <p className="text-gray-700">Python, Swift, C++, C, CUDA, Java, SQL, JavaScript (Node.js, Next.js)</p>
               </div>
               <div>
-                <h3 className="font-semibold mb-2">Frameworks & Tools</h3>
-                <p className="text-gray-700">Django, PowerShell, XML, XSLT, Snowflake, Excel, Web Application Development</p>
+                <h3 className="font-semibold mb-2">AI/ML</h3>
+                <p className="text-gray-700">PyTorch, Keras, Core-ML, Scikit-learn, Pandas, NumPy, Computer Vision (YOLO, ResNet), Signal Processing, Model Optimization (Quantization, Pruning)</p>
               </div>
               <div>
-                <h3 className="font-semibold mb-2">Cloud & DevOps</h3>
-                <p className="text-gray-700">AWS, Azure, Docker, Linux/Unix, Git, GitHub Actions, CI/CD, REST APIs</p>
-              </div>
-              <div>
-                <h3 className="font-semibold mb-2">ML & Data Analytics</h3>
-                <p className="text-gray-700">PyTorch, TensorFlow, Scikit-learn, Pandas, NumPy, Power BI, Tableau, MongoDB</p>
+                <h3 className="font-semibold mb-2">Cloud & Tools</h3>
+                <p className="text-gray-700">AWS, Azure, Kubernetes, Docker, SLURM, HPC, Power BI, Git, GitHub, Linux, REST APIs</p>
               </div>
             </div>
           </motion.section>
