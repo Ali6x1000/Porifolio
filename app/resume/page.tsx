@@ -54,7 +54,7 @@ export default function Resume() {
         'Automated a computer vision data annotation pipeline using Kubernetes, reducing manual data preparation time by 70% and accelerating model training cycles.'
       ]
     },
-     {
+    {
       title: 'IT Intern',
       company: 'EarthLink ISP',
       period: 'May 2024 – Aug 2024',
@@ -62,15 +62,37 @@ export default function Resume() {
         'Built a Java-based monitoring system for real-time network health tracking, improving fault detection by 50%.',
         'Automated support ticket classification with Python, reducing manual workload and response time by 60%.'
       ]
+    },
+    {
+      title: 'Machine Learning Research Assistant',
+      company: 'Houston Methodist Hospital',
+      period: 'Aug 2025 – Present',
+      description: [
+        'Independently researched and developed a novel hypothesis for cardiovascular risk prediction, applying a pioneer ML model to test the theory against a real-world CT scan dataset, culminating in 90% predictive accuracy.',
+        'Engineered a signal processing pipeline to digitize raw ECG images, implementing open-source models and post-processing algorithms to extract meaningful signals and enhance fidelity for downstream ML analysis.'
+      ]
+    },
+    {
+      title: 'Research Assistant',
+      company: 'Case Western Reserve University',
+      period: 'Aug 2025 – Present',
+      description: [
+        'Collaborating with Prof. Erman Ayday on a $1.2M NIH-funded project developing a privacy-preserving sandbox for federated genomic data sharing and ML-based GWAS analysis.',
+        'Implemented methods for sample relatedness and population stratification to enhance reliability for genetic association models.'
+      ]
     }
   ]
 
   const education = [
     {
-      degree: 'BS/MS in Computer Science, Secondary Major: Mathematics',
+      degree: 'BS in Computer Science, Secondary Major: Mathematics',
       school: 'Case Western Reserve University',
-      period: 'Expected May 2027',
-      relevant: ['Data Structures', 'Calculus III', 'Logic Design', 'Discrete Mathematics']
+      period: 'May 2027'
+    },
+    {
+      degree: 'MS in Machine Learning and Artificial Intelligence',
+      school: 'Case Western Reserve University',
+      period: 'May 2027'
     }
   ]
 
@@ -95,6 +117,28 @@ export default function Resume() {
       tech: 'PyTorch, VAEs, Signal Processing',
       description: [
         'Investigated generative modeling techniques by implementing a Variational Autoencoder (VAE) in PyTorch to learn latent representations of ECG waveforms for synthetic data augmentation.'
+      ]
+    },
+    {
+      title: 'Medical Smart Labeler (SAM2 Version)',
+      tech: 'PyTorch, Python, API, Git, GitHub, Docker, Networking',
+      description: [
+        'Reduced manual image annotation time by 60% by developing a Python-based tool that integrated with the Label-Studio API to pre-label images using a SAM2 model.'
+      ]
+    },
+    {
+      title: 'Variational Autoencoder (VAE) Implementation',
+      tech: 'Python, PyTorch, TensorFlow, NumPy, MNIST, Matplotlib',
+      description: [
+        'Designed and implemented a generative deep learning model to reconstruct images and generate new synthetic data samples from a learned latent space.',
+        'Visualized the learned latent walk in an interactive user interface.'
+      ]
+    },
+    {
+      title: 'Network Router Simulator',
+      tech: 'C, Binary I/O, Parsing, TCP, UDP, Data Serialization',
+      description: [
+        'Developed a flow analyzer (hash-based NetFlow, TCP RTT), a router simulator, and an IPv4 binary trace parser in C to quantitatively analyze complex network packet data in short time.'
       ]
     }
   ]
@@ -123,9 +167,32 @@ export default function Resume() {
                 <MapPin size={16} />
                 <span>Cleveland, OH</span>
               </div>
-               <a href="https://www.linkedin.com/in/alinawaf/" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 hover:text-primary-600">
+              <a
+                href="https://www.linkedin.com/in/alinawaf/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 hover:text-primary-600"
+              >
                 <ExternalLink size={16} />
                 <span>LinkedIn</span>
+              </a>
+              <a
+                href="https://alinawaf.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 hover:text-primary-600"
+              >
+                <ExternalLink size={16} />
+                <span>alinawaf.com</span>
+              </a>
+              <a
+                href="https://github.com/alinawaf"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 hover:text-primary-600"
+              >
+                <ExternalLink size={16} />
+                <span>GitHub</span>
               </a>
             </div>
             <a 
@@ -152,10 +219,6 @@ export default function Resume() {
                 <h3 className="text-xl font-semibold">{edu.degree}</h3>
                 <p className="text-primary-600 font-medium">{edu.school}</p>
                 <p className="text-gray-500">{edu.period}</p>
-                <div className="mt-2">
-                  <p className="font-medium">Relevant Coursework:</p>
-                  <p className="text-gray-700">{edu.relevant.join(', ')}</p>
-                </div>
               </div>
             ))}
           </motion.section>
@@ -209,7 +272,6 @@ export default function Resume() {
             </div>
           </motion.section>
 
-
           {/* Skills */}
           <motion.section
             initial={{ opacity: 0, y: 20 }}
@@ -222,15 +284,21 @@ export default function Resume() {
             <div className="grid md:grid-cols-2 gap-6">
               <div>
                 <h3 className="font-semibold mb-2">Languages</h3>
-                <p className="text-gray-700">Python, Swift, C++, C, CUDA, Java, SQL, JavaScript (Node.js, Next.js)</p>
+                <p className="text-gray-700">
+                  C, CUDA, Python, Java, Swift, SQL, HTML, CSS, JavaScript (Node.js, Next.js), Rust
+                </p>
               </div>
               <div>
                 <h3 className="font-semibold mb-2">AI/ML</h3>
-                <p className="text-gray-700">PyTorch, Keras, Core-ML, Scikit-learn, Pandas, NumPy, Computer Vision (YOLO, ResNet), Signal Processing, Model Optimization (Quantization, Pruning)</p>
+                <p className="text-gray-700">
+                  PyTorch, TensorFlow, Scikit-learn, NumPy, Pandas, Keras, VAEs, CNN, ResNet, YOLO, LLMs, BERT, Computer Vision, Signal Processing, Model Optimization (Quantization, Pruning)
+                </p>
               </div>
               <div>
                 <h3 className="font-semibold mb-2">Cloud & Tools</h3>
-                <p className="text-gray-700">AWS, Azure, Kubernetes, Docker, SLURM, HPC, Power BI, Git, GitHub, Linux, REST APIs</p>
+                <p className="text-gray-700">
+                  Azure, AWS, Power BI, SLURM, HPC, Kubernetes, Docker, Lambda functions, Linux, Jenkins, REST APIs, Git, GitHub
+                </p>
               </div>
             </div>
           </motion.section>
