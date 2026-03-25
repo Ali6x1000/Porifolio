@@ -131,9 +131,9 @@ export default function Home() {
               className="flex-1 flex justify-center md:justify-end"
             >
               <div className="relative w-64 h-64 md:w-96 md:h-96 rounded-full overflow-hidden border-4 border-white shadow-2xl hover:scale-105 transition-transform duration-500">
-                {/* Replace '/profile.jpg' with your actual image path in the public folder */}
+                {/* Replace '/profile.jpeg' with your actual image path in the public folder */}
                 <img 
-                  src="/profile.jpg" 
+                  src="/profile.jpeg" 
                   alt="Ali Nawaf" 
                   className="w-full h-full object-cover"
                   onError={(e) => {
