@@ -186,7 +186,7 @@ export default function Resume() {
                 <span>alinawaf.com</span>
               </a>
               <a
-                href="https://github.com/alinawaf"
+                href="https://github.com/Ali6x1000"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-2 hover:text-primary-600"
