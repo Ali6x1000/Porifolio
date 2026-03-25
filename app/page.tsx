@@ -37,8 +37,10 @@ export default function Home() {
       if (response.ok) {
         const data = await response.json()
         const projects = Array.isArray(data) ? data : []
+        // Sort projects to show newest first, assuming larger IDs or last added are newest
+        const sortedProjects = projects.reverse()
         // Get the most recent 3 projects
-        setFeaturedProjects(projects.slice(0, 3))
+        setFeaturedProjects(sortedProjects.slice(0, 3))
       } else {
         // Fallback to default projects if API fails
         setFeaturedProjects(getDefaultProjects())
@@ -84,40 +86,61 @@ export default function Home() {
   return (
     <div className="pt-16">
       {/* Hero Section */}
-      <section className="section-padding bg-gradient-to-br from-primary-50 to-white">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center">
-            <motion.h1
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
-              className="text-4xl md:text-6xl font-bold text-gray-900 mb-6"
-            >
-              Hi, I'm <span className="text-primary-600">Ali Nawaf</span>
-            </motion.h1>
+      <section className="section-padding min-h-[90vh] flex items-center bg-gradient-to-br from-gray-50 via-gray-100 to-gray-200 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+        <div className="max-w-7xl mx-auto w-full">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-12">
+            <div className="flex-1 text-center md:text-left">
+              <motion.h1
+                initial={{ opacity: 0, x: -30 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.6 }}
+                className="text-5xl md:text-7xl font-extrabold tracking-tight text-gray-900 dark:text-white mb-6"
+              >
+                Hi, I'm <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary-600 to-purple-600">Ali Nawaf</span>
+              </motion.h1>
+              
+              <motion.p
+                initial={{ opacity: 0, x: -30 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.6, delay: 0.2 }}
+                className="text-xl text-gray-600 dark:text-gray-300 mb-8 max-w-2xl"
+              >
+                Computer Science student passionate about creating innovative solutions 
+                and building impactful software applications.
+              </motion.p>
+              
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.4 }}
+                className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start"
+              >
+                <Link href="/projects" className="btn-primary inline-flex items-center hover:scale-105 transition-transform shadow-lg hover:shadow-primary-500/50">
+                  View Projects <ArrowRight className="ml-2 group-hover:translate-x-1 transition-transform" size={20} />
+                </Link>
+                <Link href="/resume" className="btn-secondary hover:scale-105 transition-transform shadow-lg">
+                  Download Resume
+                </Link>
+              </motion.div>
+            </div>
             
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
-              className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto"
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.6, delay: 0.3 }}
+              className="flex-1 flex justify-center md:justify-end"
             >
-              Computer Science student passionate about creating innovative solutions 
-              and building impactful software applications.
-            </motion.p>
-            
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.4 }}
-              className="flex flex-col sm:flex-row gap-4 justify-center"
-            >
-              <Link href="/projects" className="btn-primary inline-flex items-center">
-                View Projects <ArrowRight className="ml-2" size={20} />
-              </Link>
-              <Link href="/resume" className="btn-secondary">
-                Download Resume
-              </Link>
+              <div className="relative w-64 h-64 md:w-96 md:h-96 rounded-full overflow-hidden border-4 border-white shadow-2xl hover:scale-105 transition-transform duration-500">
+                {/* Replace '/profile.jpg' with your actual image path in the public folder */}
+                <img 
+                  src="/profile.jpg" 
+                  alt="Ali Nawaf" 
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).src = '/api/placeholder/400/400'
+                  }}
+                />
+              </div>
             </motion.div>
           </div>
         </div>
@@ -132,14 +155,15 @@ export default function Home() {
             {skills.map((skill, index) => (
               <motion.div
                 key={skill.name}
-                initial={{ opacity: 0, y: 20 }}
+                initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: index * 0.1 }}
-                className="card text-center"
+                whileHover={{ y: -10, boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)' }}
+                transition={{ duration: 0.4, delay: index * 0.1 }}
+                className="card text-center bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700"
               >
-                <skill.icon className="mx-auto mb-4 text-primary-600" size={48} />
+                <skill.icon className="mx-auto mb-6 text-primary-600 dark:text-primary-400" size={56} />
                 <h3 className="text-xl font-semibold mb-2">{skill.name}</h3>
-                <p className="text-gray-600">{skill.desc}</p>
+                <p className="text-gray-600 dark:text-gray-300">{skill.desc}</p>
               </motion.div>
             ))}
           </div>
@@ -168,12 +192,14 @@ export default function Home() {
               {featuredProjects.map((project, index) => (
                 <motion.div
                   key={project.id}
-                  initial={{ opacity: 0, y: 20 }}
+                  initial={{ opacity: 0, y: 30 }}
                   whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6, delay: index * 0.1 }}
-                  className="card group hover:scale-105 transition-transform duration-300"
+                  whileHover={{ y: -10 }}
+                  transition={{ duration: 0.5, delay: index * 0.1 }}
+                  className="card group hover:shadow-2xl bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 transition-all duration-300"
                 >
-                  <div className="h-48 bg-gradient-to-br from-primary-100 to-primary-200 rounded-lg mb-4 flex items-center justify-center overflow-hidden">
+                  <div className="h-56 bg-gradient-to-br from-primary-100 to-primary-200 rounded-lg mb-6 flex items-center justify-center overflow-hidden relative">
+                    <div className="absolute inset-0 bg-black/20 group-hover:bg-transparent transition-colors duration-300 z-10" />
                     {project.image && project.image !== '/api/placeholder/400/250' ? (
                       <img
                         src={project.image}
@@ -193,7 +219,7 @@ export default function Home() {
                   </div>
                   
                   <h3 className="text-xl font-semibold mb-2">{project.title}</h3>
-                  <p className="text-gray-600 mb-4 line-clamp-3">
+                  <p className="text-gray-600 dark:text-gray-300 mb-4 line-clamp-3">
                     {project.description}
                   </p>
                   
