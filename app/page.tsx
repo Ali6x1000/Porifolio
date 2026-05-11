@@ -145,7 +145,32 @@ export default function Home() {
           </div>
         </div>
       </section>
-
+    {/* AliJR Section */}
+    <section className="bg-gray-100 py-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center">
+            <h2 className="text-3xl font-bold text-gray-800">
+              AliJR: The RAG-Enabled Voice Clone
+            </h2>
+            <p className="mt-4 text-lg text-gray-600">
+              A high-fidelity, real-time AI agent built with LiveKit and Google Gemini. Trained on my research papers, coursework, and professional experience at Trek Health and Houston Methodist.
+            </p>
+            <div className="mt-6">
+              <Link
+                href="/alijr"
+                className="inline-block bg-primary-600 text-white px-6 py-3 rounded-md text-lg font-medium hover:bg-primary-700 transition"
+              >
+                Enter the Lab
+              </Link>
+            </div>
+            <div className="mt-4">
+              <span className="inline-block bg-green-100 text-green-800 text-sm font-medium px-3 py-1 rounded-full">
+                Live
+              </span>
+            </div>
+          </div>
+        </div>
+      </section>
       {/* Skills Section */}
       <section className="section-padding">
         <div className="max-w-7xl mx-auto">
