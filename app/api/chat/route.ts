@@ -42,7 +42,7 @@ export async function POST(req: Request) {
   }));
 
   const stream = streamText({
-    model: google('gemini-1.5-pro-latest'),
+    model: google('gemini-flash-latest'),
     messages: modelMessages,
     system: `You are AliJR, Ali Nawaf's personal AI assistant embedded on his portfolio website.
 Your job is to answer questions from recruiters and visitors about Ali's background, skills, projects, and experience.
