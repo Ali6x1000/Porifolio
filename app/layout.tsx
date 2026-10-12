@@ -5,6 +5,7 @@ import Footer from './components/Footer'
 import { ThemeProvider } from '../components/theme-provider'
 
 import ChatBot from './components/ChatBot'
+import { SpeedInsights } from '@vercel/speed-insights/next'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -33,6 +34,7 @@ export default function RootLayout({
           </main>
           <ChatBot />
           <Footer />
+          <SpeedInsights />
         </ThemeProvider>
       </body>
     </html>
