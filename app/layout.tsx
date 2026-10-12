@@ -2,6 +2,9 @@ import './globals.css'
 import { Inter } from 'next/font/google'
 import Navbar from './components/Navbar'
 import Footer from './components/Footer'
+import { ThemeProvider } from '../components/theme-provider'
+
+import ChatBot from './components/ChatBot'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -16,13 +19,21 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body className={inter.className}>
-        <Navbar />
-        <main className="min-h-screen">
-          {children}
-        </main>
-        <Footer />
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="dark"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <Navbar />
+          <main className="min-h-screen flex flex-col">
+            {children}
+          </main>
+          <ChatBot />
+          <Footer />
+        </ThemeProvider>
       </body>
     </html>
   )

@@ -154,7 +154,7 @@ export default function Resume() {
             className="text-center mb-12"
           >
             <h1 className="text-4xl font-bold mb-4">Ali Nawaf</h1>
-            <div className="flex flex-wrap justify-center gap-6 text-gray-600 mb-6">
+            <div className="flex flex-wrap justify-center gap-6 text-muted-foreground mb-6">
               <div className="flex items-center gap-2">
                 <Mail size={16} />
                 <span>aan90@case.edu</span>

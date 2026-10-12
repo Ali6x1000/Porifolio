@@ -2,10 +2,10 @@
 
 import { motion } from 'framer-motion'
 import Link from 'next/link'
-import { ArrowRight, Code, Database, Globe, Github, ExternalLink } from 'lucide-react'
+import { ArrowRight, Code, Database, Globe, Github, ExternalLink, Sparkles } from 'lucide-react'
 import { useState, useEffect } from 'react'
+import { cn } from '../lib/utils'
 
-// Add the Project interface to match the projects page
 interface Project {
   id: string
   title: string
@@ -37,12 +37,9 @@ export default function Home() {
       if (response.ok) {
         const data = await response.json()
         const projects = Array.isArray(data) ? data : []
-        // Sort projects to show newest first, assuming larger IDs or last added are newest
         const sortedProjects = projects.reverse()
-        // Get the most recent 3 projects
         setFeaturedProjects(sortedProjects.slice(0, 3))
       } else {
-        // Fallback to default projects if API fails
         setFeaturedProjects(getDefaultProjects())
       }
     } catch (error) {
@@ -84,219 +81,211 @@ export default function Home() {
   ]
 
   return (
-    <div className="pt-16">
+    <div className="relative w-full min-h-screen bg-background">
+      {/* Background Grid Pattern */}
+      <div className="absolute inset-0 bg-grid-white/[0.02] bg-[size:50px_50px] z-0 pointer-events-none dark:block hidden" />
+      <div className="absolute inset-0 bg-grid-black/[0.02] bg-[size:50px_50px] z-0 pointer-events-none dark:hidden block" />
+      
       {/* Hero Section */}
-      <section className="section-padding min-h-[90vh] flex items-center bg-gradient-to-br from-gray-50 via-gray-100 to-gray-200 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
-        <div className="max-w-7xl mx-auto w-full">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-12">
-            <div className="flex-1 text-center md:text-left">
-              <motion.h1
-                initial={{ opacity: 0, x: -30 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.6 }}
-                className="text-5xl md:text-7xl font-extrabold tracking-tight text-gray-900 dark:text-white mb-6"
-              >
-                Hi, I'm <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary-600 to-purple-600">Ali Nawaf</span>
-              </motion.h1>
-              
-              <motion.p
-                initial={{ opacity: 0, x: -30 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.6, delay: 0.2 }}
-                className="text-xl text-gray-600 dark:text-gray-300 mb-8 max-w-2xl"
-              >
-                Computer Science student passionate about creating innovative solutions 
-                and building impactful software applications.
-              </motion.p>
-              
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.4 }}
-                className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start"
-              >
-                <Link href="/projects" className="btn-primary inline-flex items-center hover:scale-105 transition-transform shadow-lg hover:shadow-primary-500/50">
-                  View Projects <ArrowRight className="ml-2 group-hover:translate-x-1 transition-transform" size={20} />
-                </Link>
-                <Link href="/resume" className="btn-secondary hover:scale-105 transition-transform shadow-lg">
-                  Download Resume
-                </Link>
-              </motion.div>
-            </div>
-            
-            <motion.div 
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.6, delay: 0.3 }}
-              className="flex-1 flex justify-center md:justify-end"
-            >
-              <div className="relative w-64 h-64 md:w-96 md:h-96 rounded-full overflow-hidden border-4 border-white shadow-2xl hover:scale-105 transition-transform duration-500">
-                {/* Replace '/profile.jpeg' with your actual image path in the public folder */}
-                <img 
-                  src="/profile.jpeg" 
-                  alt="Ali Nawaf" 
-                  className="w-full h-full object-cover"
-                  onError={(e) => {
-                    (e.target as HTMLImageElement).src = '/api/placeholder/400/400'
-                  }}
-                />
-              </div>
-            </motion.div>
-          </div>
-        </div>
-      </section>
-    {/* AliJR Section */}
-    <section className="bg-gray-100 py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <h2 className="text-3xl font-bold text-gray-800">
-              AliJR: The RAG-Enabled Voice Clone
-            </h2>
-            <p className="mt-4 text-lg text-gray-600">
-              A high-fidelity, real-time AI agent built with LiveKit and Google Gemini. Trained on my research papers, coursework, and professional experience at Trek Health and Houston Methodist.
-            </p>
-            <div className="mt-6">
-              <Link
-                href="/alijr"
-                className="inline-block bg-primary-600 text-white px-6 py-3 rounded-md text-lg font-medium hover:bg-primary-700 transition"
-              >
-                Enter the Lab
-              </Link>
-            </div>
-            <div className="mt-4">
-              <span className="inline-block bg-green-100 text-green-800 text-sm font-medium px-3 py-1 rounded-full">
-                Live
-              </span>
-            </div>
-          </div>
-        </div>
-      </section>
-      {/* Skills Section */}
-      <section className="section-padding">
-        <div className="max-w-7xl mx-auto">
-          <h2 className="text-3xl font-bold text-center mb-12">Skills & Expertise</h2>
+      <section className="relative z-10 min-h-[90vh] flex flex-col items-center justify-center pt-24 pb-16 px-4">
+        <div className="max-w-4xl mx-auto text-center">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="mb-6 flex justify-center"
+          >
+            <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-muted text-sm font-medium border border-border">
+              <Sparkles size={16} className="text-primary" />
+              Building the future of AI & Web
+            </span>
+          </motion.div>
+
+          <motion.h1
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+            className="text-5xl md:text-7xl font-extrabold tracking-tight mb-8"
+          >
+            Hi, I'm <span className="text-gradient">Ali Nawaf</span>
+          </motion.h1>
           
-          <div className="grid md:grid-cols-3 gap-8">
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+            className="text-lg md:text-xl text-muted-foreground mb-12 max-w-2xl mx-auto"
+          >
+            Computer Science student passionate about creating innovative solutions, 
+            artificial intelligence, and building impactful software applications.
+          </motion.p>
+          
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.3 }}
+            className="flex flex-col sm:flex-row gap-4 justify-center items-center"
+          >
+            <Link href="/projects" className="btn-primary group h-12 px-8 text-base rounded-full">
+              View Projects 
+              <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
+            </Link>
+            <Link href="/resume" className="btn-secondary h-12 px-8 text-base rounded-full">
+              Download Resume
+            </Link>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* AliJR Spotlight Section */}
+      <section className="relative z-10 py-16 px-4">
+        <div className="max-w-5xl mx-auto">
+          <div className="relative rounded-3xl overflow-hidden border border-border bg-card/50 backdrop-blur-sm p-8 md:p-12 shadow-2xl">
+            <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-transparent pointer-events-none" />
+            <div className="relative flex flex-col md:flex-row items-center justify-between gap-8">
+              <div className="flex-1 text-center md:text-left">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-green-500/10 text-green-500 text-xs font-bold uppercase tracking-wider mb-4 border border-green-500/20">
+                  <span className="relative flex h-2 w-2">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+                  </span>
+                  Live AI Agent
+                </div>
+                <h2 className="text-3xl md:text-4xl font-bold mb-4">
+                  AliJR: RAG-Enabled Voice Clone
+                </h2>
+                <p className="text-muted-foreground text-lg mb-6 max-w-xl">
+                  A high-fidelity, real-time AI agent built with LiveKit and Google Gemini. 
+                  Trained on my research papers, coursework, and professional experience.
+                </p>
+                <Link
+                  href="/alijr"
+                  className="btn-primary"
+                >
+                  Enter the Lab
+                </Link>
+              </div>
+              <div className="flex-1 flex justify-center w-full max-w-sm">
+                 <div className="w-full aspect-square rounded-2xl bg-gradient-to-tr from-primary/20 to-purple-500/20 border border-white/10 flex items-center justify-center shadow-inner relative overflow-hidden">
+                    <Sparkles className="w-16 h-16 text-primary animate-pulse" />
+                 </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Skills Bento Grid */}
+      <section className="relative z-10 py-24 px-4 bg-muted/30">
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl font-bold mb-4">Skills & Expertise</h2>
+            <p className="text-muted-foreground">What I bring to the table</p>
+          </div>
+          
+          <div className="grid md:grid-cols-3 gap-6">
             {skills.map((skill, index) => (
               <motion.div
                 key={skill.name}
-                initial={{ opacity: 0, y: 30 }}
+                initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                whileHover={{ y: -10, boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)' }}
+                viewport={{ once: true }}
                 transition={{ duration: 0.4, delay: index * 0.1 }}
-                className="card text-center bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700"
+                className="group relative rounded-2xl border border-border bg-card p-8 hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
               >
-                <skill.icon className="mx-auto mb-6 text-primary-600 dark:text-primary-400" size={56} />
-                <h3 className="text-xl font-semibold mb-2">{skill.name}</h3>
-                <p className="text-gray-600 dark:text-gray-300">{skill.desc}</p>
+                <div className="absolute top-0 right-0 p-6 opacity-5 group-hover:opacity-10 transition-opacity">
+                  <skill.icon size={100} />
+                </div>
+                <div className="h-12 w-12 rounded-lg bg-primary/10 flex items-center justify-center mb-6">
+                  <skill.icon className="text-primary" size={24} />
+                </div>
+                <h3 className="text-xl font-semibold mb-3">{skill.name}</h3>
+                <p className="text-muted-foreground">{skill.desc}</p>
               </motion.div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Featured Projects Section */}
-      <section className="section-padding bg-gray-100">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold mb-4">Featured Projects</h2>
-            <p className="text-gray-600">Check out some of my recent work</p>
+      {/* Featured Projects */}
+      <section className="relative z-10 py-24 px-4">
+        <div className="max-w-5xl mx-auto">
+          <div className="flex justify-between items-end mb-12">
+            <div>
+              <h2 className="text-3xl font-bold mb-2">Featured Work</h2>
+              <p className="text-muted-foreground">Some of my recent projects</p>
+            </div>
+            <Link href="/projects" className="hidden md:flex text-sm font-medium text-primary hover:underline items-center gap-1">
+              View all <ArrowRight size={16} />
+            </Link>
           </div>
           
           {loading ? (
-            <div className="text-center py-12">
-              <div className="animate-spin w-8 h-8 border-2 border-primary-600 border-t-transparent rounded-full mx-auto mb-4"></div>
-              <p className="text-gray-600">Loading projects...</p>
-            </div>
-          ) : featuredProjects.length === 0 ? (
-            <div className="text-center py-12">
-              <p className="text-gray-500 text-lg">No projects available yet.</p>
+            <div className="flex justify-center py-20">
+              <div className="animate-spin w-8 h-8 border-2 border-primary border-t-transparent rounded-full"></div>
             </div>
           ) : (
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-8">
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
               {featuredProjects.map((project, index) => (
                 <motion.div
                   key={project.id}
-                  initial={{ opacity: 0, y: 30 }}
+                  initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
-                  whileHover={{ y: -10 }}
-                  transition={{ duration: 0.5, delay: index * 0.1 }}
-                  className="card group hover:shadow-2xl bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 transition-all duration-300"
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.4, delay: index * 0.1 }}
+                  className="flex flex-col rounded-2xl border border-border bg-card overflow-hidden group hover:shadow-xl transition-all"
                 >
-                  <div className="h-56 bg-gradient-to-br from-primary-100 to-primary-200 rounded-lg mb-6 flex items-center justify-center overflow-hidden relative">
-                    <div className="absolute inset-0 bg-black/20 group-hover:bg-transparent transition-colors duration-300 z-10" />
+                  <div className="h-48 w-full bg-muted relative overflow-hidden flex items-center justify-center">
                     {project.image && project.image !== '/api/placeholder/400/250' ? (
                       <img
                         src={project.image}
                         alt={project.title}
-                        className="w-full h-full object-cover"
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                         onError={(e) => {
-                          (e.target as HTMLImageElement).style.display = 'none'
-                          const parent = (e.target as HTMLImageElement).parentElement
-                          if (parent) {
-                            parent.innerHTML = '<div class="flex items-center justify-center w-full h-full"><svg class="text-primary-600" width="48" height="48" fill="currentColor" viewBox="0 0 24 24"><path d="M9.4 16.6L4.8 12l4.6-4.6L8 6l-6 6 6 6 1.4-1.4zm5.2 0L19.2 12l-4.6-4.6L16 6l6 6-6 6-1.4-1.4z"/></svg></div>'
-                          }
+                          (e.target as HTMLImageElement).style.display = 'none';
                         }}
                       />
                     ) : (
-                      <Code className="text-primary-600" size={48} />
+                      <Code className="text-muted-foreground/30" size={48} />
                     )}
                   </div>
                   
-                  <h3 className="text-xl font-semibold mb-2">{project.title}</h3>
-                  <p className="text-gray-600 dark:text-gray-300 mb-4 line-clamp-3">
-                    {project.description}
-                  </p>
-                  
-                  <div className="flex flex-wrap gap-2 mb-4">
-                    {project.technologies.slice(0, 3).map((tech: string) => (
-                      <span
-                        key={tech}
-                        className="bg-primary-100 text-primary-800 px-2 py-1 rounded text-sm"
-                      >
-                        {tech}
-                      </span>
-                    ))}
-                    {project.technologies.length > 3 && (
-                      <span className="text-sm text-gray-500">
-                        +{project.technologies.length - 3} more
-                      </span>
-                    )}
-                  </div>
-                  
-                  <div className="flex gap-3">
-                    {project.github && (
-                      <a
-                        href={project.github}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex items-center gap-2 text-gray-600 hover:text-primary-600 transition-colors text-sm"
-                      >
-                        <Github size={16} />
-                        Code
-                      </a>
-                    )}
-                    {project.demo && (
-                      <a
-                        href={project.demo}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex items-center gap-2 text-gray-600 hover:text-primary-600 transition-colors text-sm"
-                      >
-                        <ExternalLink size={16} />
-                        Demo
-                      </a>
-                    )}
+                  <div className="flex flex-col flex-1 p-6">
+                    <h3 className="text-lg font-bold mb-2 group-hover:text-primary transition-colors">{project.title}</h3>
+                    <p className="text-muted-foreground text-sm mb-6 flex-1 line-clamp-3">
+                      {project.description}
+                    </p>
+                    
+                    <div className="flex flex-wrap gap-2 mb-6">
+                      {project.technologies.slice(0, 3).map((tech) => (
+                        <span key={tech} className="px-2 py-1 bg-secondary rounded-md text-xs font-medium text-secondary-foreground">
+                          {tech}
+                        </span>
+                      ))}
+                    </div>
+                    
+                    <div className="flex items-center gap-4 mt-auto">
+                      {project.github && (
+                        <a href={project.github} target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground transition-colors">
+                          <Github size={20} />
+                        </a>
+                      )}
+                      {project.demo && (
+                        <a href={project.demo} target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground transition-colors">
+                          <ExternalLink size={20} />
+                        </a>
+                      )}
+                    </div>
                   </div>
                 </motion.div>
               ))}
             </div>
           )}
           
-          <div className="text-center">
-            <Link href="/projects" className="btn-primary">
-              View All Projects
-            </Link>
+          <div className="mt-8 md:hidden text-center">
+             <Link href="/projects" className="btn-secondary w-full">
+               View All Projects
+             </Link>
           </div>
         </div>
       </section>
