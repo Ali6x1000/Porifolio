@@ -1,31 +1,45 @@
 'use client';
 
-import { useChat } from 'ai/react';
+import { useChat } from '@ai-sdk/react';
+import type { UIMessage } from 'ai';
 import { useState, useRef, useEffect } from 'react';
-import { MessageCircle, X, Send, Bot, User, Minimize2 } from 'lucide-react';
+import { MessageCircle, Send, Bot, User, Minimize2 } from 'lucide-react';
 import { cn } from '../../lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export default function ChatBot() {
   const [isOpen, setIsOpen] = useState(false);
-  const { messages, input, handleInputChange, handleSubmit, isLoading } = useChat({
-    api: '/api/chat',
-    initialMessages: [
+  const [inputValue, setInputValue] = useState('');
+  const { messages, sendMessage, status } = useChat<UIMessage>({
+    messages: [
       {
         id: '1',
         role: 'assistant',
-        content: "Hi! I'm Ali's AI assistant. You can ask me questions about his experience, skills, or projects."
+        parts: [{ type: 'text', text: "Hi! I'm Ali's AI assistant. Ask me anything about his experience, skills, or projects." }],
       }
     ]
   });
-  const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  // Auto-scroll to bottom
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const isLoading = status === 'streaming' || status === 'submitted';
+
   useEffect(() => {
-    if (messagesEndRef.current) {
-      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
-    }
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!inputValue.trim() || isLoading) return;
+    sendMessage({ text: inputValue });
+    setInputValue('');
+  };
+
+  const getMessageText = (msg: typeof messages[0]) => {
+    return msg.parts
+      .filter((p): p is { type: 'text'; text: string } => p.type === 'text')
+      .map(p => p.text)
+      .join('');
+  };
 
   return (
     <>
@@ -94,17 +108,17 @@ export default function ChatBot() {
                   </div>
                   <div className={cn(
                     "p-3 rounded-2xl text-sm whitespace-pre-wrap",
-                    m.role === 'user' 
-                      ? "bg-primary text-primary-foreground rounded-tr-sm" 
+                    m.role === 'user'
+                      ? "bg-primary text-primary-foreground rounded-tr-sm"
                       : "bg-muted text-foreground rounded-tl-sm border border-border/50"
                   )}>
-                    {m.content}
+                    {getMessageText(m)}
                   </div>
                 </div>
               ))}
               {isLoading && (
                 <div className="flex gap-3 max-w-[85%]">
-                   <div className="w-8 h-8 rounded-full flex-shrink-0 flex items-center justify-center bg-primary text-primary-foreground">
+                  <div className="w-8 h-8 rounded-full flex-shrink-0 flex items-center justify-center bg-primary text-primary-foreground">
                     <Bot size={16} />
                   </div>
                   <div className="p-4 rounded-2xl bg-muted rounded-tl-sm flex items-center gap-1">
@@ -121,14 +135,14 @@ export default function ChatBot() {
             <form onSubmit={handleSubmit} className="p-3 border-t border-border bg-card">
               <div className="relative flex items-center">
                 <input
-                  value={input}
-                  onChange={handleInputChange}
+                  value={inputValue}
+                  onChange={(e) => setInputValue(e.target.value)}
                   placeholder="Ask me anything..."
                   className="w-full bg-muted/50 border border-border rounded-full py-3 pl-4 pr-12 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all placeholder:text-muted-foreground"
                 />
                 <button
                   type="submit"
-                  disabled={isLoading || !input.trim()}
+                  disabled={isLoading || !inputValue.trim()}
                   className="absolute right-2 w-8 h-8 bg-primary text-primary-foreground rounded-full flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed hover:bg-primary/90 transition-colors"
                 >
                   <Send size={14} className="ml-0.5" />
@@ -141,4 +155,3 @@ export default function ChatBot() {
     </>
   );
 }
-
