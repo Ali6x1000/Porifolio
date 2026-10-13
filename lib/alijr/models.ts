@@ -2,7 +2,7 @@ import { google } from '@ai-sdk/google';
 import { groq } from '@ai-sdk/groq';
 import type { LanguageModelV4, LanguageModelV4CallOptions } from '@ai-sdk/provider';
 import { APICallError, wrapLanguageModel } from 'ai';
-import { ALIJR_CHAT_MODEL, ALIJR_FALLBACK_CHAT_MODEL, ALIJR_GROQ_MODEL } from './config';
+import { ALIJR_CHAT_MODEL, ALIJR_GROQ_MODELS } from './config';
 
 // Groq's free tier allows ~8K tokens per minute, so long search results are trimmed for it.
 const GROQ_TOOL_RESULT_CHARS = 5000;
@@ -43,18 +43,17 @@ function describe(error: unknown): string {
 }
 
 /**
- * Gemini first, then backups when it is overloaded or rate limited. Create one per request:
+ * Gemini first, then Groq models when it is overloaded or rate limited. Create one per request:
  * once a backup succeeds, the remaining tool-loop steps stay on it.
  */
 export function createChatModel(): LanguageModelV4 {
   const primary = google(ALIJR_CHAT_MODEL);
-  const backups: Candidate[] = [{ model: google(ALIJR_FALLBACK_CHAT_MODEL) }];
-  if (process.env.GROQ_API_KEY) {
-    backups.push({
-      model: groq(ALIJR_GROQ_MODEL),
-      prepare: (params) => compactToolResults(params, GROQ_TOOL_RESULT_CHARS),
-    });
-  }
+  const backups: Candidate[] = process.env.GROQ_API_KEY
+    ? ALIJR_GROQ_MODELS.map((id) => ({
+        model: groq(id),
+        prepare: (params) => compactToolResults(params, GROQ_TOOL_RESULT_CHARS),
+      }))
+    : [];
 
   let active = -1;
 
