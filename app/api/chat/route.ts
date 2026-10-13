@@ -1,6 +1,5 @@
-import { google } from '@ai-sdk/google';
 import { convertToModelMessages, isStepCount, streamText, type UIMessage } from 'ai';
-import { ALIJR_CHAT_MODEL } from '../../../lib/alijr/config';
+import { createChatModel } from '../../../lib/alijr/models';
 import { TEXT_SYSTEM_PROMPT } from '../../../lib/alijr/prompt';
 import { alijrTools } from '../../../lib/alijr/tools';
 
@@ -20,11 +19,13 @@ export async function POST(req: Request) {
   }));
 
   const result = streamText({
-    model: google(ALIJR_CHAT_MODEL),
+    model: createChatModel(),
     system: TEXT_SYSTEM_PROMPT,
     messages: await convertToModelMessages(recent),
     tools: alijrTools,
     stopWhen: isStepCount(6),
+    // Each attempt already walks the whole fallback chain.
+    maxRetries: 1,
   });
 
   return result.toUIMessageStreamResponse({
