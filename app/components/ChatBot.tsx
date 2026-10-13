@@ -1,154 +1,157 @@
 'use client';
 
-import { useChat } from '@ai-sdk/react';
-import type { UIMessage } from 'ai';
-import { useState, useRef, useEffect } from 'react';
-import { MessageCircle, Send, Bot, User, Minimize2 } from 'lucide-react';
-import { cn } from '../../lib/utils';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
+import { Maximize2, RotateCcw, X } from 'lucide-react';
+import dynamic from 'next/dynamic';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import { AliJRChat } from './alijr/AliJRChat';
+import { useAliJRChat } from './alijr/chat-store';
+import { ModeToggle, type AliJRMode } from './alijr/ModeToggle';
+import { Orb } from './alijr/Orb';
+
+const AliJRVoice = dynamic(() => import('./alijr/AliJRVoice'), { ssr: false });
+
+const TEASER_KEY = 'alijr-teaser-dismissed';
 
 export default function ChatBot() {
-  const [isOpen, setIsOpen] = useState(false);
-  const [inputValue, setInputValue] = useState('');
-  const { messages, sendMessage, status } = useChat<UIMessage>({
-    messages: [
-      {
-        id: '1',
-        role: 'assistant',
-        parts: [{ type: 'text', text: "Hi! I'm Ali's AI assistant. Ask me anything about his experience, skills, or projects." }],
-      }
-    ]
-  });
-
-  const messagesEndRef = useRef<HTMLDivElement>(null);
-  const isLoading = status === 'streaming' || status === 'submitted';
+  const pathname = usePathname();
+  const [open, setOpen] = useState(false);
+  const [mode, setMode] = useState<AliJRMode>('chat');
+  const [teaser, setTeaser] = useState(false);
+  const { messages, setMessages, stop } = useAliJRChat();
 
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
+    if (sessionStorage.getItem(TEASER_KEY)) return;
+    const id = setTimeout(() => setTeaser(true), 4000);
+    return () => clearTimeout(id);
+  }, []);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!inputValue.trim() || isLoading) return;
-    sendMessage({ text: inputValue });
-    setInputValue('');
+  const dismissTeaser = () => {
+    setTeaser(false);
+    sessionStorage.setItem(TEASER_KEY, '1');
   };
 
-  const getMessageText = (msg: typeof messages[0]) => {
-    return msg.parts
-      .filter((p): p is { type: 'text'; text: string } => p.type === 'text')
-      .map(p => p.text)
-      .join('');
+  const openPanel = (nextMode: AliJRMode = mode) => {
+    dismissTeaser();
+    setMode(nextMode);
+    setOpen(true);
   };
+
+  if (pathname?.startsWith('/alijr')) return null;
 
   return (
     <>
-      {/* Floating Action Button */}
       <AnimatePresence>
-        {!isOpen && (
-          <motion.button
-            initial={{ scale: 0, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            exit={{ scale: 0, opacity: 0 }}
-            onClick={() => setIsOpen(true)}
-            className="fixed bottom-6 right-6 h-14 w-14 bg-primary text-primary-foreground rounded-full flex items-center justify-center shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all z-50 border border-primary/20"
+        {!open && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.8 }}
+            className="fixed bottom-6 right-6 z-50 flex items-end gap-3"
           >
-            <MessageCircle size={24} />
-          </motion.button>
+            <AnimatePresence>
+              {teaser && (
+                <motion.div
+                  initial={{ opacity: 0, x: 10, scale: 0.95 }}
+                  animate={{ opacity: 1, x: 0, scale: 1 }}
+                  exit={{ opacity: 0, x: 10, scale: 0.95 }}
+                  className="relative mb-2 hidden max-w-[220px] rounded-2xl rounded-br-md border border-border bg-card/95 px-4 py-3 text-sm shadow-xl backdrop-blur sm:block"
+                >
+                  <button
+                    type="button"
+                    aria-label="Dismiss"
+                    onClick={dismissTeaser}
+                    className="absolute -left-2 -top-2 flex h-5 w-5 items-center justify-center rounded-full border border-border bg-background text-muted-foreground hover:text-foreground"
+                  >
+                    <X size={11} />
+                  </button>
+                  <button type="button" onClick={() => openPanel('chat')} className="text-left">
+                    <span className="font-medium">Hi, I&apos;m AliJR</span>
+                    <span className="mt-0.5 block text-xs text-muted-foreground">
+                      Ali&apos;s AI twin. Ask me about his work, or talk to me by voice.
+                    </span>
+                  </button>
+                </motion.div>
+              )}
+            </AnimatePresence>
+            <motion.button
+              type="button"
+              onClick={() => openPanel()}
+              aria-label="Open AliJR assistant"
+              whileHover={{ scale: 1.08 }}
+              whileTap={{ scale: 0.95 }}
+              className="relative rounded-full shadow-2xl shadow-indigo-500/30"
+            >
+              <Orb size={60} />
+            </motion.button>
+          </motion.div>
         )}
       </AnimatePresence>
 
-      {/* Chat Window */}
       <AnimatePresence>
-        {isOpen && (
+        {open && (
           <motion.div
-            initial={{ opacity: 0, y: 20, scale: 0.95 }}
+            initial={{ opacity: 0, y: 24, scale: 0.96 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 20, scale: 0.95 }}
-            transition={{ duration: 0.2 }}
-            className="fixed bottom-6 right-6 w-full max-w-[380px] h-[600px] max-h-[80vh] bg-card border border-border rounded-2xl shadow-2xl flex flex-col z-50 overflow-hidden"
+            exit={{ opacity: 0, y: 24, scale: 0.96 }}
+            transition={{ type: 'spring', stiffness: 380, damping: 32 }}
+            style={{ transformOrigin: 'bottom right' }}
+            className="fixed bottom-4 right-4 z-50 flex h-[min(660px,calc(100dvh-2rem))] w-[calc(100vw-2rem)] flex-col overflow-hidden rounded-3xl border border-border bg-background/85 shadow-2xl backdrop-blur-xl sm:bottom-6 sm:right-6 sm:w-[400px]"
           >
-            {/* Header */}
-            <div className="flex items-center justify-between p-4 border-b border-border bg-muted/30 backdrop-blur-md">
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center">
-                  <Bot size={18} className="text-primary" />
-                </div>
-                <div>
-                  <h3 className="font-semibold text-sm">AliJR Assistant</h3>
-                  <div className="flex items-center gap-1.5">
-                    <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
-                    <span className="text-xs text-muted-foreground">Online</span>
-                  </div>
-                </div>
+            <div className="flex items-center gap-3 border-b border-border/60 px-4 py-3">
+              <Orb size={34} />
+              <div className="min-w-0 flex-1">
+                <p className="text-sm font-semibold leading-tight">AliJR</p>
+                <p className="flex items-center gap-1.5 whitespace-nowrap text-[11px] text-muted-foreground">
+                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                  Ali&apos;s AI twin
+                </p>
               </div>
-              <button
-                onClick={() => setIsOpen(false)}
-                className="text-muted-foreground hover:text-foreground transition-colors p-2 hover:bg-muted rounded-full"
-              >
-                <Minimize2 size={18} />
-              </button>
-            </div>
-
-            {/* Messages Area */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-background/50">
-              {messages.map((m) => (
-                <div
-                  key={m.id}
-                  className={cn(
-                    "flex gap-3 max-w-[85%]",
-                    m.role === 'user' ? "ml-auto flex-row-reverse" : ""
-                  )}
+              <ModeToggle mode={mode} onChange={setMode} layoutId="alijr-widget-mode" />
+              <div className="flex items-center">
+                {mode === 'chat' && messages.length > 0 && (
+                  <button
+                    type="button"
+                    aria-label="New chat"
+                    title="New chat"
+                    onClick={() => {
+                      stop();
+                      setMessages([]);
+                    }}
+                    className="rounded-lg p-1.5 text-muted-foreground transition hover:bg-muted hover:text-foreground"
+                  >
+                    <RotateCcw size={15} />
+                  </button>
+                )}
+                <Link
+                  href="/alijr"
+                  aria-label="Open full page"
+                  title="Open full page"
+                  onClick={() => setOpen(false)}
+                  className="rounded-lg p-1.5 text-muted-foreground transition hover:bg-muted hover:text-foreground"
                 >
-                  <div className={cn(
-                    "w-8 h-8 rounded-full flex-shrink-0 flex items-center justify-center",
-                    m.role === 'user' ? "bg-secondary text-secondary-foreground" : "bg-primary text-primary-foreground"
-                  )}>
-                    {m.role === 'user' ? <User size={16} /> : <Bot size={16} />}
-                  </div>
-                  <div className={cn(
-                    "p-3 rounded-2xl text-sm whitespace-pre-wrap",
-                    m.role === 'user'
-                      ? "bg-primary text-primary-foreground rounded-tr-sm"
-                      : "bg-muted text-foreground rounded-tl-sm border border-border/50"
-                  )}>
-                    {getMessageText(m)}
-                  </div>
-                </div>
-              ))}
-              {isLoading && (
-                <div className="flex gap-3 max-w-[85%]">
-                  <div className="w-8 h-8 rounded-full flex-shrink-0 flex items-center justify-center bg-primary text-primary-foreground">
-                    <Bot size={16} />
-                  </div>
-                  <div className="p-4 rounded-2xl bg-muted rounded-tl-sm flex items-center gap-1">
-                    <span className="w-1.5 h-1.5 bg-foreground/50 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></span>
-                    <span className="w-1.5 h-1.5 bg-foreground/50 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></span>
-                    <span className="w-1.5 h-1.5 bg-foreground/50 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></span>
-                  </div>
-                </div>
-              )}
-              <div ref={messagesEndRef} />
-            </div>
-
-            {/* Input Area */}
-            <form onSubmit={handleSubmit} className="p-3 border-t border-border bg-card">
-              <div className="relative flex items-center">
-                <input
-                  value={inputValue}
-                  onChange={(e) => setInputValue(e.target.value)}
-                  placeholder="Ask me anything..."
-                  className="w-full bg-muted/50 border border-border rounded-full py-3 pl-4 pr-12 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all placeholder:text-muted-foreground"
-                />
+                  <Maximize2 size={15} />
+                </Link>
                 <button
-                  type="submit"
-                  disabled={isLoading || !inputValue.trim()}
-                  className="absolute right-2 w-8 h-8 bg-primary text-primary-foreground rounded-full flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed hover:bg-primary/90 transition-colors"
+                  type="button"
+                  aria-label="Close"
+                  onClick={() => setOpen(false)}
+                  className="rounded-lg p-1.5 text-muted-foreground transition hover:bg-muted hover:text-foreground"
                 >
-                  <Send size={14} className="ml-0.5" />
+                  <X size={16} />
                 </button>
               </div>
-            </form>
+            </div>
+
+            <div className="min-h-0 flex-1">
+              {mode === 'chat' ? (
+                <AliJRChat variant="widget" onStartVoice={() => setMode('voice')} />
+              ) : (
+                <AliJRVoice variant="widget" onSwitchToChat={() => setMode('chat')} />
+              )}
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
