@@ -32,7 +32,7 @@ export async function POST(req: Request) {
     sendReasoning: false,
     onError: (error) => {
       console.error('[alijr chat]', error);
-      return 'AliJR hit a snag reaching the model. Please try again in a moment.';
+      return 'The twin hit a snag reaching the model. Please try again in a moment.';
     },
   });
 }

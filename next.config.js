@@ -15,12 +15,16 @@ const nextConfig = {
   },
   trailingSlash: true,
   skipTrailingSlashRedirect: true,
+  async redirects() {
+    return [{ source: '/alijr/:path*', destination: '/twin', permanent: true }];
+  },
   experimental: {
     serverComponentsExternalPackages: ['@huggingface/transformers', 'onnxruntime-node', 'sharp'],
     // Transformers.js loads onnxruntime-node via createRequire, which file tracing can't follow.
     outputFileTracingIncludes: {
       '/api/chat': embedderFiles,
       '/api/alijr/tools': embedderFiles,
+      '/api/alijr/explore': embedderFiles,
     },
     // Vercel functions run on linux x64; the other prebuilt ONNX binaries would blow the 250 MB limit.
     outputFileTracingExcludes: {

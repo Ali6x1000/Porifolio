@@ -11,12 +11,12 @@ import { ModeToggle, type AliJRMode } from '../components/alijr/ModeToggle';
 const AliJRVoice = dynamic(() => import('../components/alijr/AliJRVoice'), { ssr: false });
 
 const FEATURES = [
-  { icon: Database, text: '8,000+ passages from my docs' },
-  { icon: Search, text: 'Cites the sources it reads' },
+  { icon: Database, text: 'Resume, repos, research & coursework' },
+  { icon: Search, text: 'Type / to run its tools yourself' },
   { icon: Mic, text: 'Real-time voice with Gemini Live' },
 ];
 
-export default function AliJRExperience() {
+export default function TwinExperience() {
   const [mode, setMode] = useState<AliJRMode>('chat');
   const { messages, setMessages, stop } = useAliJRChat();
 
@@ -40,7 +40,7 @@ export default function AliJRExperience() {
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
             <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">
-              Talk to <span className="bg-gradient-to-r from-indigo-400 via-fuchsia-400 to-cyan-400 bg-clip-text text-transparent">AliJR</span>
+              <span className="bg-gradient-to-r from-indigo-400 via-fuchsia-400 to-cyan-400 bg-clip-text text-transparent">Agentic</span> Twin
             </h1>
             <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1">
               {FEATURES.map(({ icon: Icon, text }) => (

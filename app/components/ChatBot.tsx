@@ -39,7 +39,7 @@ export default function ChatBot() {
     setOpen(true);
   };
 
-  if (pathname?.startsWith('/alijr')) return null;
+  if (pathname?.startsWith('/twin')) return null;
 
   return (
     <>
@@ -68,9 +68,9 @@ export default function ChatBot() {
                     <X size={11} />
                   </button>
                   <button type="button" onClick={() => openPanel('chat')} className="text-left">
-                    <span className="font-medium">Hi, I&apos;m AliJR</span>
+                    <span className="font-medium">Agentic Twin</span>
                     <span className="mt-0.5 block text-xs text-muted-foreground">
-                      Ali&apos;s AI twin. Ask me about his work, or talk to me by voice.
+                      Ask about Ali&apos;s resume, projects, research or coursework, by text or voice.
                     </span>
                   </button>
                 </motion.div>
@@ -79,7 +79,7 @@ export default function ChatBot() {
             <motion.button
               type="button"
               onClick={() => openPanel()}
-              aria-label="Open AliJR assistant"
+              aria-label="Open Agentic Twin"
               whileHover={{ scale: 1.08 }}
               whileTap={{ scale: 0.95 }}
               className="relative rounded-full shadow-2xl shadow-indigo-500/30"
@@ -103,10 +103,10 @@ export default function ChatBot() {
             <div className="flex items-center gap-3 border-b border-border/60 px-4 py-3">
               <Orb size={34} />
               <div className="min-w-0 flex-1">
-                <p className="text-sm font-semibold leading-tight">AliJR</p>
+                <p className="text-sm font-semibold leading-tight">Agentic Twin</p>
                 <p className="flex items-center gap-1.5 whitespace-nowrap text-[11px] text-muted-foreground">
                   <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
-                  Ali&apos;s AI twin
+                  Online · type / for tools
                 </p>
               </div>
               <ModeToggle mode={mode} onChange={setMode} layoutId="alijr-widget-mode" />
@@ -126,7 +126,7 @@ export default function ChatBot() {
                   </button>
                 )}
                 <Link
-                  href="/alijr"
+                  href="/twin"
                   aria-label="Open full page"
                   title="Open full page"
                   onClick={() => setOpen(false)}

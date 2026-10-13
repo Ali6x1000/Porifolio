@@ -8,6 +8,7 @@ import {
   Check,
   Code2,
   Copy,
+  CornerDownLeft,
   FileText,
   FolderOpen,
   GraduationCap,
@@ -18,10 +19,12 @@ import {
   Search,
   Square,
 } from 'lucide-react';
-import { useEffect, useRef, useState, type KeyboardEvent } from 'react';
+import { useCallback, useEffect, useRef, useState, type KeyboardEvent } from 'react';
 import type { AliJRMessage } from '../../../lib/alijr/types';
 import { cn } from '../../../lib/utils';
 import { SUGGESTIONS, useAliJRChat } from './chat-store';
+import { CommandPopup } from './CommandPopup';
+import { COMMANDS, matchCommands, parseCommand, viewFor, type CommandView, type SlashCommand } from './commands';
 import { Markdown } from './Markdown';
 import { Orb } from './Orb';
 
@@ -170,17 +173,28 @@ function MessageView({ message }: { message: AliJRMessage }) {
   );
 }
 
-function EmptyState({ variant, onPick }: { variant: 'widget' | 'page'; onPick: (prompt: string) => void }) {
+const QUICK_COMMANDS = ['/resume', '/projects', '/search'];
+
+function EmptyState({
+  variant,
+  onPick,
+  onCommand,
+}: {
+  variant: 'widget' | 'page';
+  onPick: (prompt: string) => void;
+  onCommand: (command: SlashCommand) => void;
+}) {
   const page = variant === 'page';
   return (
     <div className={cn('flex h-full flex-col items-center justify-center text-center', page ? 'gap-6 px-4' : 'gap-4 px-2')}>
       <Orb size={page ? 120 : 72} />
       <div className="space-y-1.5">
         <h2 className={cn('font-semibold tracking-tight', page ? 'text-2xl sm:text-3xl' : 'text-lg')}>
-          Hey, I&apos;m AliJR
+          Agentic Twin
         </h2>
         <p className={cn('mx-auto text-muted-foreground', page ? 'max-w-md text-sm sm:text-base' : 'max-w-xs text-xs')}>
-          Ali&apos;s AI twin. I&apos;ve read his resume, project repos, research and coursework. Ask me anything.
+          An AI agent with access to Ali&apos;s resume, project repos, research and coursework. Ask anything, or
+          type <kbd className="rounded border border-border px-1 font-mono text-[0.9em]">/</kbd> to explore them directly.
         </p>
       </div>
       <div className={cn('grid w-full gap-2', page ? 'max-w-xl sm:grid-cols-2' : 'grid-cols-2')}>
@@ -206,7 +220,79 @@ function EmptyState({ variant, onPick }: { variant: 'widget' | 'page'; onPick: (
           );
         })}
       </div>
+      <div className="flex flex-wrap justify-center gap-1.5">
+        {COMMANDS.filter((c) => QUICK_COMMANDS.includes(c.name)).map((c) => (
+          <button
+            key={c.name}
+            type="button"
+            onClick={() => onCommand(c)}
+            title={c.description}
+            className="inline-flex items-center gap-1.5 rounded-full border border-border/70 bg-card/60 px-2.5 py-1 font-mono text-[11px] text-muted-foreground transition hover:border-primary/30 hover:text-foreground"
+          >
+            <c.icon size={12} />
+            {c.name}
+          </button>
+        ))}
+      </div>
     </div>
+  );
+}
+
+function SlashMenu({
+  items,
+  active,
+  onHover,
+  onPick,
+}: {
+  items: SlashCommand[];
+  active: number;
+  onHover: (index: number) => void;
+  onPick: (command: SlashCommand) => void;
+}) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 6 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: 6 }}
+      transition={{ duration: 0.12 }}
+      role="listbox"
+      className="absolute inset-x-0 bottom-full z-20 mb-2 overflow-hidden rounded-2xl border border-border bg-card/95 p-1.5 shadow-2xl backdrop-blur"
+    >
+      <p className="px-2.5 pb-1 pt-0.5 text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
+        Tools
+      </p>
+      {items.map((c, i) => (
+        <button
+          key={c.name}
+          type="button"
+          role="option"
+          aria-selected={i === active}
+          onMouseEnter={() => onHover(i)}
+          onMouseDown={(e) => e.preventDefault()}
+          onClick={() => onPick(c)}
+          className={cn(
+            'flex w-full items-center gap-3 rounded-xl px-2.5 py-2 text-left transition-colors',
+            i === active ? 'bg-muted' : 'hover:bg-muted/60',
+          )}
+        >
+          <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+            <c.icon size={14} />
+          </span>
+          <span className="min-w-0 flex-1">
+            <span className="block font-mono text-xs font-medium">
+              {c.name}
+              {c.arg && (
+                <span className="ml-1.5 text-muted-foreground">
+                  {c.arg.required ? `<${c.arg.label}>` : `[${c.arg.label}]`}
+                </span>
+              )}
+            </span>
+            <span className="block truncate text-[11px] text-muted-foreground">{c.description}</span>
+          </span>
+          {i === active && <CornerDownLeft size={12} className="shrink-0 text-muted-foreground" />}
+        </button>
+      ))}
+    </motion.div>
   );
 }
 
@@ -219,9 +305,39 @@ export function AliJRChat({
 }) {
   const { messages, sendMessage, status, stop, error, regenerate } = useAliJRChat();
   const [input, setInput] = useState('');
+  const [view, setView] = useState<CommandView | null>(null);
+  const [activeCommand, setActiveCommand] = useState(0);
+  const [menuDismissed, setMenuDismissed] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const busy = status === 'submitted' || status === 'streaming';
+
+  const menuItems = menuDismissed ? [] : matchCommands(input);
+  const menuOpen = menuItems.length > 0;
+
+  useEffect(() => {
+    setActiveCommand(0);
+    if (!input.startsWith('/')) setMenuDismissed(false);
+  }, [input]);
+
+  const closePopup = useCallback(() => {
+    setView(null);
+    inputRef.current?.focus();
+  }, []);
+
+  const runCommand = (command: SlashCommand, arg = '') => {
+    setView(viewFor(command, arg));
+    setInput('');
+  };
+
+  const pickCommand = (command: SlashCommand) => {
+    if (command.arg?.required) {
+      setInput(`${command.name} `);
+      inputRef.current?.focus();
+    } else {
+      runCommand(command);
+    }
+  };
 
   useEffect(() => {
     const el = scrollRef.current;
@@ -241,10 +357,34 @@ export function AliJRChat({
     setInput('');
   };
 
+  const submit = (text: string) => {
+    const parsed = parseCommand(text);
+    if (parsed) runCommand(parsed.command, parsed.arg);
+    else send(text);
+  };
+
   const onKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
+    if (menuOpen) {
+      if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+        e.preventDefault();
+        const step = e.key === 'ArrowDown' ? 1 : -1;
+        setActiveCommand((i) => (i + step + menuItems.length) % menuItems.length);
+        return;
+      }
+      if ((e.key === 'Enter' || e.key === 'Tab') && !e.shiftKey && !e.nativeEvent.isComposing) {
+        e.preventDefault();
+        pickCommand(menuItems[Math.min(activeCommand, menuItems.length - 1)]);
+        return;
+      }
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        setMenuDismissed(true);
+        return;
+      }
+    }
     if (e.key === 'Enter' && !e.shiftKey && !e.nativeEvent.isComposing) {
       e.preventDefault();
-      send(input);
+      submit(input);
     }
   };
 
@@ -260,10 +400,20 @@ export function AliJRChat({
   const page = variant === 'page';
 
   return (
-    <div className="flex h-full min-h-0 flex-col">
+    <div className="relative flex h-full min-h-0 flex-col">
+      <CommandPopup
+        view={view}
+        variant={variant}
+        onNavigate={setView}
+        onClose={closePopup}
+        onAsk={(text) => {
+          setView(null);
+          send(text);
+        }}
+      />
       <div ref={scrollRef} className={cn('min-h-0 flex-1 overflow-y-auto', page ? 'px-4 py-6 sm:px-8' : 'px-4 py-4')}>
         {messages.length === 0 ? (
-          <EmptyState variant={variant} onPick={send} />
+          <EmptyState variant={variant} onPick={send} onCommand={pickCommand} />
         ) : (
           <div className={cn('mx-auto space-y-5', page && 'max-w-2xl')}>
             {messages.map((m) => (
@@ -283,7 +433,7 @@ export function AliJRChat({
                   exit={{ opacity: 0 }}
                   className="flex items-center justify-between gap-3 rounded-xl border border-destructive/30 bg-destructive/10 px-3 py-2 text-xs"
                 >
-                  <span>Something went wrong reaching AliJR.</span>
+                  <span>Something went wrong reaching the twin.</span>
                   <button
                     type="button"
                     onClick={() => regenerate()}
@@ -302,19 +452,24 @@ export function AliJRChat({
         <form
           onSubmit={(e) => {
             e.preventDefault();
-            send(input);
+            submit(input);
           }}
           className={cn(
-            'mx-auto flex items-end gap-2 rounded-2xl border border-border bg-card/80 p-1.5 shadow-sm transition focus-within:border-primary/40 focus-within:ring-2 focus-within:ring-primary/10',
+            'relative mx-auto flex items-end gap-2 rounded-2xl border border-border bg-card/80 p-1.5 shadow-sm transition focus-within:border-primary/40 focus-within:ring-2 focus-within:ring-primary/10',
             page && 'max-w-2xl',
           )}
         >
+          <AnimatePresence>
+            {menuOpen && (
+              <SlashMenu items={menuItems} active={activeCommand} onHover={setActiveCommand} onPick={pickCommand} />
+            )}
+          </AnimatePresence>
           {onStartVoice && (
             <button
               type="button"
               onClick={onStartVoice}
               aria-label="Switch to voice"
-              title="Talk to AliJR"
+              title="Talk by voice"
               className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-muted-foreground transition hover:bg-muted hover:text-foreground"
             >
               <Mic size={17} />
@@ -326,9 +481,22 @@ export function AliJRChat({
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={onKeyDown}
-            placeholder={page ? "Ask about Ali's projects, research, or experience…" : 'Ask me anything…'}
+            placeholder={page ? 'Ask about projects, research, or experience, or type / for tools' : 'Ask anything, or type / for tools'}
             className="max-h-[140px] min-h-[36px] flex-1 resize-none bg-transparent px-2 py-2 text-sm outline-none placeholder:text-muted-foreground"
           />
+          <button
+            type="button"
+            onClick={() => {
+              setInput('/');
+              setMenuDismissed(false);
+              inputRef.current?.focus();
+            }}
+            aria-label="Show tools"
+            title="Tools (/)"
+            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl font-mono text-sm text-muted-foreground transition hover:bg-muted hover:text-foreground"
+          >
+            /
+          </button>
           {busy ? (
             <button
               type="button"
@@ -351,7 +519,7 @@ export function AliJRChat({
         </form>
         {page && (
           <p className="mt-2 text-center text-[11px] text-muted-foreground">
-            AliJR answers from Ali&apos;s own documents and can still make mistakes.
+            Answers come from Ali&apos;s own documents and can still contain mistakes.
           </p>
         )}
       </div>

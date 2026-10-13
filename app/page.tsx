@@ -137,7 +137,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* AliJR Spotlight Section */}
+      {/* Agentic Twin Spotlight Section */}
       <section className="relative z-10 py-16 px-4">
         <div className="max-w-5xl mx-auto">
           <div className="relative rounded-3xl overflow-hidden border border-border bg-card/50 backdrop-blur-sm p-8 md:p-12 shadow-2xl">
@@ -152,17 +152,17 @@ export default function Home() {
                   Live AI Agent
                 </div>
                 <h2 className="text-3xl md:text-4xl font-bold mb-4">
-                  AliJR: RAG-Enabled Voice Clone
+                  Agentic Twin
                 </h2>
                 <p className="text-muted-foreground text-lg mb-6 max-w-xl">
-                  A high-fidelity, real-time AI agent built with LiveKit and Google Gemini. 
-                  Trained on my research papers, coursework, and professional experience.
+                  An AI agent with access to my resume, project repos, research and coursework.
+                  Chat or talk by voice in real time, or run its RAG tools yourself with / commands.
                 </p>
                 <Link
-                  href="/alijr"
+                  href="/twin"
                   className="btn-primary"
                 >
-                  Enter the Lab
+                  Try the Agentic Twin
                 </Link>
               </div>
               <div className="flex-1 flex justify-center w-full max-w-sm">

@@ -10,15 +10,15 @@ Experience:
 - AI SWE Intern, Heads-up Hockey (Dec 2024–Aug 2025): SwiftUI game with on-device inference (+100% users); SAM2 + YOLO annotation pipeline (-70% time); stick-handling model (+30% accuracy).
 - AI SWE Intern, Eaton (Jan–May 2025): Azure pipeline for 10k Salesforce records/month, -35% latency, Power BI, agentic RAG.
 
-Projects: RepBend (AI safety via latent-space warping), DDPM Markov chain research, Dispatch (voice-driven agent orchestrator), AI Medical Labeler (SAM2 + Label Studio, -60% annotation time), VAE implementation, AliJR (this assistant).
+Projects: RepBend (AI safety via latent-space warping), DDPM Markov chain research, Dispatch (voice-driven agent orchestrator), AI Medical Labeler (SAM2 + Label Studio, -60% annotation time), VAE implementation, Agentic Twin (this assistant).
 
 Skills: C, Python, Java, SQL, Swift, TypeScript/JavaScript, PyTorch, TensorFlow, scikit-learn, RAG, Azure, AWS, Kubernetes, SLURM/HPC, Linux.
 Contact: ${CONTACT.email} | ${CONTACT.phone} | ${CONTACT.linkedin} | ${CONTACT.github} | ${CONTACT.website}
 `.trim();
 
 const SHARED_RULES = `
-You are AliJR (Ali Junior), the digital twin of Ali Nawaf, built by Ali and embedded on his portfolio website.
-You speak about Ali's work in first person ("I built…", "my research…") because you are his avatar, but never claim to be a human.
+You are Agentic Twin, an AI agent built by Ali Nawaf and embedded on his portfolio website. You have tool access to his resume, project repositories, research, coursework and assignments.
+You speak about Ali's work in first person ("I built…", "my research…"), but never claim to be a human. If asked what you are, say you are an AI agent with access to Ali's documents.
 
 How to use your tools:
 - Resume, employers, dates, education, skills, contact details: call readResume and answer only from it.

@@ -19,7 +19,7 @@ type Connection = { token: string; serverUrl: string };
 
 const STATE_LABELS: Record<OrbState, string> = {
   idle: 'Ready',
-  connecting: 'AliJR is joining…',
+  connecting: 'Twin is joining…',
   listening: 'Listening',
   thinking: 'Thinking',
   speaking: 'Speaking',
@@ -90,7 +90,7 @@ function ActiveCall({ variant, onEnd }: { variant: 'widget' | 'page'; onEnd: () 
         </motion.p>
         {slowJoin && (
           <p className="max-w-xs text-center text-xs text-muted-foreground">
-            AliJR is taking longer than usual to join. The voice server may be waking up, so hang tight or try text chat.
+            The twin is taking longer than usual to join. The voice server may be waking up, so hang tight or try text chat.
           </p>
         )}
       </div>
@@ -107,7 +107,7 @@ function ActiveCall({ variant, onEnd }: { variant: 'widget' | 'page'; onEnd: () 
               className={cn('text-center leading-snug', page ? 'text-base' : 'text-sm', c.you ? 'text-muted-foreground' : 'text-foreground')}
             >
               <span className="mr-1.5 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-                {c.you ? 'You' : 'AliJR'}
+                {c.you ? 'You' : 'Twin'}
               </span>
               {c.text}
             </motion.p>
@@ -189,7 +189,7 @@ export default function AliJRVoice({
     <div className="flex h-full flex-col items-center justify-center gap-6 px-6 text-center">
       <Orb size={page ? 200 : 130} />
       <div className="space-y-1.5">
-        <h2 className={cn('font-semibold tracking-tight', page ? 'text-2xl sm:text-3xl' : 'text-lg')}>Talk to AliJR</h2>
+        <h2 className={cn('font-semibold tracking-tight', page ? 'text-2xl sm:text-3xl' : 'text-lg')}>Talk to the Agentic Twin</h2>
         <p className={cn('mx-auto text-muted-foreground', page ? 'max-w-md text-sm' : 'max-w-xs text-xs')}>
           A real-time voice conversation powered by Gemini Live. Your microphone is only used during the call.
         </p>
