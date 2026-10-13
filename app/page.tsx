@@ -2,84 +2,14 @@
 
 import { motion } from 'framer-motion'
 import Link from 'next/link'
-import { ArrowRight, Code, Database, Globe, Github, ExternalLink, Sparkles } from 'lucide-react'
-import { useState, useEffect } from 'react'
-import { cn } from '../lib/utils'
+import { ArrowRight, Sparkles } from 'lucide-react'
+import { SkillsSection } from './components/SkillsSection'
+import { ProjectCard } from './components/projects/ProjectCard'
+import { PROJECTS } from '../lib/projects'
 
-interface Project {
-  id: string
-  title: string
-  description: string
-  technologies: string[]
-  github: string
-  demo: string | null
-  image: string
-}
+const featuredProjects = PROJECTS.filter((project) => project.featured)
 
 export default function Home() {
-  const [featuredProjects, setFeaturedProjects] = useState<Project[]>([])
-  const [loading, setLoading] = useState(true)
-
-  const skills = [
-    { icon: Code, name: 'Programming', desc: 'JavaScript, Python, Java, C++' },
-    { icon: Globe, name: 'Web Development', desc: 'React, Next.js, Node.js' },
-    { icon: Database, name: 'Database', desc: 'MongoDB, PostgreSQL, MySQL' },
-  ]
-
-  useEffect(() => {
-    fetchFeaturedProjects()
-  }, [])
-
-  const fetchFeaturedProjects = async () => {
-    setLoading(true)
-    try {
-      const response = await fetch('/api/projects')
-      if (response.ok) {
-        const data = await response.json()
-        const projects = Array.isArray(data) ? data : []
-        const sortedProjects = projects.reverse()
-        setFeaturedProjects(sortedProjects.slice(0, 3))
-      } else {
-        setFeaturedProjects(getDefaultProjects())
-      }
-    } catch (error) {
-      console.error('Failed to fetch featured projects:', error)
-      setFeaturedProjects(getDefaultProjects())
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const getDefaultProjects = (): Project[] => [
-    {
-      id: '1',
-      title: 'Computer Vision SmartLabeler',
-      description: 'Built an interface on top of Label-Studio to automate annotations, reducing cost and manpower for labeling images.',
-      technologies: ['PyTorch', 'Python', 'Docker', 'API'],
-      github: 'https://github.com/alinawaf/smartlabeler',
-      demo: null,
-      image: '/api/placeholder/400/250'
-    },
-    {
-      id: '2',
-      title: 'ElectroVector App',
-      description: 'Data analytics Swift + Python app converting ECGs into vectorcardiograms, extracting clinically meaningful metrics.',
-      technologies: ['Swift', 'Python', 'API', 'Healthcare'],
-      github: 'https://github.com/alinawaf/electrovector',
-      demo: null,
-      image: '/api/placeholder/400/250'
-    },
-    {
-      id: '3',
-      title: 'Hockey Analytics ML',
-      description: 'Computer vision models for real-time video analysis, achieving 3× accuracy gains and faster inference speed.',
-      technologies: ['PyTorch', 'TensorFlow', 'iOS', 'ML'],
-      github: 'https://github.com/alinawaf/hockey-ml',
-      demo: null,
-      image: '/api/placeholder/400/250'
-    }
-  ]
-
   return (
     <div className="relative w-full min-h-screen bg-background">
       {/* Background Grid Pattern */}
@@ -158,12 +88,14 @@ export default function Home() {
                   An AI agent with access to my resume, project repos, research and coursework.
                   Chat or talk by voice in real time, or run its RAG tools yourself with / commands.
                 </p>
-                <Link
-                  href="/twin"
-                  className="btn-primary"
-                >
-                  Try the Agentic Twin
-                </Link>
+                <div className="flex flex-wrap justify-center gap-3 md:justify-start">
+                  <Link href="/twin" className="btn-primary">
+                    Try the Agentic Twin
+                  </Link>
+                  <Link href="/projects#agentic-twin" className="btn-secondary">
+                    How it&apos;s built
+                  </Link>
+                </div>
               </div>
               <div className="flex-1 flex justify-center w-full max-w-sm">
                  <div className="w-full aspect-square rounded-2xl bg-gradient-to-tr from-primary/20 to-purple-500/20 border border-white/10 flex items-center justify-center shadow-inner relative overflow-hidden">
@@ -175,37 +107,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Skills Bento Grid */}
-      <section className="relative z-10 py-24 px-4 bg-muted/30">
-        <div className="max-w-5xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl font-bold mb-4">Skills & Expertise</h2>
-            <p className="text-muted-foreground">What I bring to the table</p>
-          </div>
-          
-          <div className="grid md:grid-cols-3 gap-6">
-            {skills.map((skill, index) => (
-              <motion.div
-                key={skill.name}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.4, delay: index * 0.1 }}
-                className="group relative rounded-2xl border border-border bg-card p-8 hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
-              >
-                <div className="absolute top-0 right-0 p-6 opacity-5 group-hover:opacity-10 transition-opacity">
-                  <skill.icon size={100} />
-                </div>
-                <div className="h-12 w-12 rounded-lg bg-primary/10 flex items-center justify-center mb-6">
-                  <skill.icon className="text-primary" size={24} />
-                </div>
-                <h3 className="text-xl font-semibold mb-3">{skill.name}</h3>
-                <p className="text-muted-foreground">{skill.desc}</p>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
+      <SkillsSection />
 
       {/* Featured Projects */}
       <section className="relative z-10 py-24 px-4">
@@ -213,75 +115,28 @@ export default function Home() {
           <div className="flex justify-between items-end mb-12">
             <div>
               <h2 className="text-3xl font-bold mb-2">Featured Work</h2>
-              <p className="text-muted-foreground">Some of my recent projects</p>
+              <p className="text-muted-foreground">Selected AI safety and medical AI work</p>
             </div>
             <Link href="/projects" className="hidden md:flex text-sm font-medium text-primary hover:underline items-center gap-1">
               View all <ArrowRight size={16} />
             </Link>
           </div>
           
-          {loading ? (
-            <div className="flex justify-center py-20">
-              <div className="animate-spin w-8 h-8 border-2 border-primary border-t-transparent rounded-full"></div>
-            </div>
-          ) : (
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {featuredProjects.map((project, index) => (
-                <motion.div
-                  key={project.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.4, delay: index * 0.1 }}
-                  className="flex flex-col rounded-2xl border border-border bg-card overflow-hidden group hover:shadow-xl transition-all"
-                >
-                  <div className="h-48 w-full bg-muted relative overflow-hidden flex items-center justify-center">
-                    {project.image && project.image !== '/api/placeholder/400/250' ? (
-                      <img
-                        src={project.image}
-                        alt={project.title}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                        onError={(e) => {
-                          (e.target as HTMLImageElement).style.display = 'none';
-                        }}
-                      />
-                    ) : (
-                      <Code className="text-muted-foreground/30" size={48} />
-                    )}
-                  </div>
-                  
-                  <div className="flex flex-col flex-1 p-6">
-                    <h3 className="text-lg font-bold mb-2 group-hover:text-primary transition-colors">{project.title}</h3>
-                    <p className="text-muted-foreground text-sm mb-6 flex-1 line-clamp-3">
-                      {project.description}
-                    </p>
-                    
-                    <div className="flex flex-wrap gap-2 mb-6">
-                      {project.technologies.slice(0, 3).map((tech) => (
-                        <span key={tech} className="px-2 py-1 bg-secondary rounded-md text-xs font-medium text-secondary-foreground">
-                          {tech}
-                        </span>
-                      ))}
-                    </div>
-                    
-                    <div className="flex items-center gap-4 mt-auto">
-                      {project.github && (
-                        <a href={project.github} target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground transition-colors">
-                          <Github size={20} />
-                        </a>
-                      )}
-                      {project.demo && (
-                        <a href={project.demo} target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground transition-colors">
-                          <ExternalLink size={20} />
-                        </a>
-                      )}
-                    </div>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-          )}
-          
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {featuredProjects.map((project, index) => (
+              <motion.div
+                key={project.slug}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.4, delay: index * 0.1 }}
+                className="flex"
+              >
+                <ProjectCard project={project} compact className="w-full" />
+              </motion.div>
+            ))}
+          </div>
+
           <div className="mt-8 md:hidden text-center">
              <Link href="/projects" className="btn-secondary w-full">
                View All Projects

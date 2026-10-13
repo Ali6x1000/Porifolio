@@ -1,184 +1,209 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { Github, ExternalLink, Code } from 'lucide-react'
-import { useState, useEffect } from 'react'
-import dynamic from 'next/dynamic'
+import Link from 'next/link'
+import { FileText, X } from 'lucide-react'
+import { useEffect, useMemo, useState } from 'react'
+import { ProjectCard } from '../components/projects/ProjectCard'
+import { cn } from '../../lib/utils'
+import {
+  PROJECTS,
+  TRACKS,
+  curatedRepoNames,
+  repoName,
+  usesSkill,
+  type CuratedProject,
+  type ProjectTrack,
+} from '../../lib/projects'
 
-interface Project {
+interface AdminProject {
   id: string
   title: string
   description: string
   technologies: string[]
   github: string
   demo: string | null
-  image: string
 }
 
-function ProjectsContent() {
-  const [projects, setProjects] = useState<Project[]>([])
-  const [mounted, setMounted] = useState(false)
-  const [loading, setLoading] = useState(true)
+type TrackFilter = 'all' | ProjectTrack
+
+const FILTERS: { id: TrackFilter; label: string }[] = [
+  { id: 'all', label: 'All' },
+  { id: 'ai', label: 'AI & ML' },
+  { id: 'swe', label: 'Software Engineering' },
+]
+
+/** Projects added through the admin panel that are not already in the curated list. */
+function toExtraProjects(items: AdminProject[]): CuratedProject[] {
+  const known = curatedRepoNames()
+  const knownTitles = new Set(PROJECTS.map((p) => p.title.toLowerCase()))
+  return items
+    .filter((item) => {
+      const repo = repoName(item.github)
+      return !(repo && known.has(repo)) && !knownTitles.has(item.title.toLowerCase())
+    })
+    .map((item) => ({
+      slug: `more-${item.id}`,
+      title: item.title,
+      track: 'swe' as const,
+      category: 'Project',
+      tagline: item.description,
+      highlights: [],
+      stack: item.technologies.flatMap((t) => t.split(/[|,]/)).map((t) => t.trim()).filter(Boolean),
+      links: [
+        ...(item.demo ? [{ label: 'Demo', href: item.demo, kind: 'live' as const }] : []),
+        ...(item.github ? [{ label: 'Code', href: item.github, kind: 'github' as const }] : []),
+      ],
+    }))
+}
+
+function updateQuery(track: TrackFilter, skill: string | null) {
+  const params = new URLSearchParams()
+  if (track !== 'all') params.set('track', track)
+  if (skill) params.set('skill', skill)
+  const query = params.toString()
+  window.history.replaceState(null, '', `${window.location.pathname}${query ? `?${query}` : ''}${window.location.hash}`)
+}
+
+export default function Projects() {
+  const [track, setTrack] = useState<TrackFilter>('all')
+  const [skill, setSkill] = useState<string | null>(null)
+  const [extras, setExtras] = useState<CuratedProject[]>([])
 
   useEffect(() => {
-    setMounted(true)
-    fetchProjects()
+    const params = new URLSearchParams(window.location.search)
+    const initialTrack = params.get('track')
+    if (initialTrack === 'ai' || initialTrack === 'swe') setTrack(initialTrack)
+    setSkill(params.get('skill'))
+
+    fetch('/api/projects')
+      .then((res) => (res.ok ? res.json() : []))
+      .then((data) => setExtras(toExtraProjects(Array.isArray(data) ? data : [])))
+      .catch(() => setExtras([]))
   }, [])
 
-  const fetchProjects = async () => {
-    setLoading(true)
-    try {
-      const response = await fetch('/api/projects')
-      if (response.ok) {
-        const data = await response.json()
-        setProjects(Array.isArray(data) ? data : [])
-      } else {
-        setProjects(getDefaultProjects())
-      }
-    } catch (error) {
-      console.error('Failed to fetch projects:', error)
-      setProjects(getDefaultProjects())
-    } finally {
-      setLoading(false)
-    }
+  const selectTrack = (next: TrackFilter) => {
+    setTrack(next)
+    updateQuery(next, skill)
   }
 
-  const getDefaultProjects = (): Project[] => [
-    {
-      id: '1',
-      title: 'E-Commerce Platform',
-      description: 'Full-stack e-commerce application with user authentication, payment processing, and admin dashboard.',
-      technologies: ['React', 'Node.js', 'MongoDB', 'Stripe'],
-      github: 'https://github.com/yourusername/ecommerce',
-      demo: 'https://your-ecommerce-demo.com',
-      image: '/api/placeholder/400/250'
-    },
-    {
-      id: '2',
-      title: 'Task Management App',
-      description: 'Collaborative task management tool with real-time updates, drag-and-drop functionality, and team features.',
-      technologies: ['Next.js', 'TypeScript', 'PostgreSQL', 'Socket.io'],
-      github: 'https://github.com/yourusername/taskapp',
-      demo: 'https://your-taskapp-demo.com',
-      image: '/api/placeholder/400/250'
-    },
-    {
-      id: '3',
-      title: 'Weather Dashboard',
-      description: 'Weather application with location-based forecasts, interactive maps, and historical data visualization.',
-      technologies: ['React', 'Chart.js', 'Weather API', 'Tailwind CSS'],
-      github: 'https://github.com/yourusername/weather',
-      demo: 'https://your-weather-demo.com',
-      image: '/api/placeholder/400/250'
-    }
-  ]
-
-  if (!mounted || loading) {
-    return (
-      <div className="pt-24 min-h-screen bg-background relative flex items-center justify-center">
-        <div className="absolute inset-0 bg-grid-white/[0.02] bg-[size:50px_50px] z-0 pointer-events-none dark:block hidden" />
-        <div className="absolute inset-0 bg-grid-black/[0.02] bg-[size:50px_50px] z-0 pointer-events-none dark:hidden block" />
-        <div className="flex flex-col items-center">
-          <div className="animate-spin w-8 h-8 border-2 border-primary border-t-transparent rounded-full mb-4"></div>
-          <p className="text-muted-foreground">Loading projects...</p>
-        </div>
-      </div>
-    )
+  const clearSkill = () => {
+    setSkill(null)
+    updateQuery(track, null)
   }
+
+  const sections = useMemo(() => {
+    const visible = (p: CuratedProject) => (track === 'all' || p.track === track) && (!skill || usesSkill(p, skill))
+    const tracks: ProjectTrack[] = track === 'all' ? ['ai', 'swe'] : [track]
+    return tracks
+      .map((t) => ({ track: t, projects: PROJECTS.filter((p) => p.track === t && visible(p)) }))
+      .filter((s) => s.projects.length > 0)
+  }, [track, skill])
+
+  const visibleExtras = track === 'ai' ? [] : extras.filter((p) => !skill || usesSkill(p, skill))
 
   return (
     <div className="pt-24 min-h-screen bg-background relative pb-20">
       <div className="absolute inset-0 bg-grid-white/[0.02] bg-[size:50px_50px] z-0 pointer-events-none dark:block hidden" />
       <div className="absolute inset-0 bg-grid-black/[0.02] bg-[size:50px_50px] z-0 pointer-events-none dark:hidden block" />
-      
+
       <section className="relative z-10 px-4">
         <div className="max-w-6xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-center mb-16"
+            className="text-center mb-10"
           >
-            <h1 className="text-4xl md:text-5xl font-extrabold mb-6 tracking-tight">My Projects</h1>
+            <h1 className="text-4xl md:text-5xl font-extrabold mb-6 tracking-tight">Projects</h1>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              A collection of projects showcasing my skills in web development, 
-              machine learning, and software engineering.
+              AI agents, AI safety research and medical deep learning first, followed by the software I&apos;ve shipped.
             </p>
           </motion.div>
 
-          {projects.length === 0 ? (
-            <div className="text-center py-12">
-              <p className="text-muted-foreground text-lg">No projects available yet.</p>
-            </div>
-          ) : (
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {projects.map((project, index) => (
-                <motion.div
-                  key={project.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.4, delay: index * 0.1 }}
-                  className="flex flex-col rounded-2xl border border-border bg-card overflow-hidden group hover:shadow-2xl transition-all hover:-translate-y-1"
+          <div className="mb-12 flex flex-col items-center gap-4">
+            <div className="inline-flex rounded-full border border-border bg-card p-1">
+              {FILTERS.map((filter) => (
+                <button
+                  key={filter.id}
+                  onClick={() => selectTrack(filter.id)}
+                  className={cn(
+                    'rounded-full px-4 py-1.5 text-sm font-medium transition-colors',
+                    track === filter.id ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:text-foreground'
+                  )}
                 >
-                  <div className="h-48 w-full bg-muted relative overflow-hidden flex items-center justify-center">
-                    {project.image && project.image !== '/api/placeholder/400/250' ? (
-                      <img
-                        src={project.image}
-                        alt={project.title}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                        onError={(e) => {
-                          (e.target as HTMLImageElement).style.display = 'none';
-                        }}
-                      />
-                    ) : (
-                      <Code className="text-muted-foreground/30" size={48} />
-                    )}
-                  </div>
-                  
-                  <div className="flex flex-col flex-1 p-6">
-                    <h3 className="text-xl font-bold mb-2 group-hover:text-primary transition-colors">{project.title}</h3>
-                    <p className="text-muted-foreground text-sm mb-6 flex-1">
-                      {project.description}
-                    </p>
-                    
-                    <div className="flex flex-wrap gap-2 mb-6">
-                      {project.technologies.map((tech) => (
-                        <span key={tech} className="px-2 py-1 bg-secondary rounded-md text-xs font-medium text-secondary-foreground border border-border/50">
-                          {tech}
-                        </span>
-                      ))}
-                    </div>
-                    
-                    <div className="flex items-center gap-4 mt-auto pt-4 border-t border-border/50">
-                      {project.github && (
-                        <a href={project.github} target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1.5 text-sm font-medium">
-                          <Github size={18} /> Code
-                        </a>
-                      )}
-                      {project.demo && (
-                        <a href={project.demo} target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1.5 text-sm font-medium">
-                          <ExternalLink size={18} /> Demo
-                        </a>
-                      )}
-                    </div>
-                  </div>
-                </motion.div>
+                  {filter.label}
+                </button>
               ))}
             </div>
+            {skill && (
+              <button
+                onClick={clearSkill}
+                className="inline-flex items-center gap-2 rounded-full border border-primary/40 bg-primary/10 px-3 py-1 text-sm text-primary hover:bg-primary/15"
+              >
+                Showing projects using <strong>{skill}</strong>
+                <X size={14} />
+              </button>
+            )}
+          </div>
+
+          {sections.length === 0 && visibleExtras.length === 0 && (
+            <p className="py-12 text-center text-muted-foreground">No projects match this filter.</p>
           )}
+
+          <div className="space-y-16">
+            {sections.map(({ track: t, projects }) => (
+              <div key={t}>
+                <div className="mb-6 flex items-end justify-between gap-4 border-b border-border pb-4">
+                  <div>
+                    <h2 className="text-2xl font-bold">{TRACKS[t].title}</h2>
+                    <p className="text-sm text-muted-foreground">{TRACKS[t].blurb}</p>
+                  </div>
+                  <span className="text-sm text-muted-foreground">{projects.length} projects</span>
+                </div>
+                <div className="grid gap-6 md:grid-cols-2">
+                  {projects.map((project) => {
+                    const wide = project.slug === 'agentic-twin' && !skill
+                    return (
+                      <ProjectCard
+                        key={project.slug}
+                        project={project}
+                        wide={wide}
+                        highlightSkill={skill}
+                        className={wide ? 'md:col-span-2' : undefined}
+                      />
+                    )
+                  })}
+                </div>
+              </div>
+            ))}
+
+            {visibleExtras.length > 0 && (
+              <div>
+                <div className="mb-6 border-b border-border pb-4">
+                  <h2 className="text-2xl font-bold">More Projects</h2>
+                </div>
+                <div className="grid gap-6 md:grid-cols-2">
+                  {visibleExtras.map((project) => (
+                    <ProjectCard key={project.slug} project={project} highlightSkill={skill} />
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+
+          <div className="mt-16 flex flex-col items-center gap-3 text-center">
+            <p className="text-muted-foreground">Want the full picture, including industry work?</p>
+            <div className="flex flex-wrap justify-center gap-3">
+              <Link href="/resume" className="btn-secondary rounded-full">
+                <FileText size={16} className="mr-2" /> View resume
+              </Link>
+              <Link href="/twin" className="btn-primary rounded-full">
+                Ask the Agentic Twin
+              </Link>
+            </div>
+          </div>
         </div>
       </section>
     </div>
   )
 }
-
-const Projects = dynamic(() => Promise.resolve(ProjectsContent), {
-  ssr: false,
-  loading: () => (
-    <div className="pt-24 min-h-screen bg-background flex items-center justify-center">
-      <div className="animate-spin w-8 h-8 border-2 border-primary border-t-transparent rounded-full mb-4"></div>
-    </div>
-  )
-})
-
-export default Projects
