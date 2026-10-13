@@ -31,7 +31,7 @@ import { cn } from '../../lib/utils'
 import type { AboutData, Role } from '../../lib/about'
 import type { ContributionDay, LiveStats } from '../../lib/live-stats'
 
-const ACCENT = 'text-sky-600 dark:text-sky-400'
+const ACCENT = 'text-brand'
 
 function formatMonth(iso: string) {
   const [year, month] = iso.split('-').map(Number)
@@ -159,11 +159,11 @@ function StatTile({
   return (
     <div
       className={cn(
-        'group relative flex flex-col rounded-2xl border border-border bg-card p-6 transition-colors hover:border-sky-500/40',
+        'group relative flex flex-col rounded-2xl border border-border bg-card p-6 transition-colors hover:border-brand/40',
         className
       )}
     >
-      <div className="mb-4 flex h-9 w-9 items-center justify-center rounded-lg bg-sky-500/10">
+      <div className="mb-4 flex h-9 w-9 items-center justify-center rounded-lg bg-brand/10">
         <Icon size={18} className={ACCENT} />
       </div>
       <CountUp value={value} className="text-4xl font-bold tracking-tight text-foreground" />
@@ -258,13 +258,13 @@ export function AboutView({
               </span>
               <a
                 href={`mailto:${about.email}`}
-                className="inline-flex items-center gap-2 rounded-full border border-border px-3 py-1.5 text-foreground/80 transition-colors hover:border-sky-500/50 hover:text-foreground"
+                className="inline-flex items-center gap-2 rounded-full border border-border px-3 py-1.5 text-foreground/80 transition-colors hover:border-brand/50 hover:text-foreground"
               >
                 <Mail size={15} className={ACCENT} /> {about.email}
               </a>
               <a
                 href={`tel:${about.phone.replace(/[^+\d]/g, '')}`}
-                className="inline-flex items-center gap-2 rounded-full border border-border px-3 py-1.5 text-foreground/80 transition-colors hover:border-sky-500/50 hover:text-foreground"
+                className="inline-flex items-center gap-2 rounded-full border border-border px-3 py-1.5 text-foreground/80 transition-colors hover:border-brand/50 hover:text-foreground"
               >
                 <Phone size={15} className={ACCENT} /> {about.phone}
               </a>
@@ -386,7 +386,7 @@ export function AboutView({
           <SectionHeading eyebrow="Journey" title="How I got here" />
           <ol className="relative space-y-6 border-l border-border pl-8">
             <li className="relative">
-              <span className="absolute -left-[41px] flex h-6 w-6 items-center justify-center rounded-full border border-sky-500/50 bg-background">
+              <span className="absolute -left-[41px] flex h-6 w-6 items-center justify-center rounded-full border border-brand/50 bg-background">
                 <GraduationCap size={13} className={ACCENT} />
               </span>
               <p className="text-sm font-medium text-muted-foreground">{graduation.label}</p>
@@ -400,7 +400,7 @@ export function AboutView({
                   <span className="absolute -left-[41px] flex h-6 w-6 items-center justify-center rounded-full border border-border bg-background">
                     <Icon size={13} className="text-foreground/70" />
                   </span>
-                  <div className="rounded-2xl border border-border bg-card p-5 transition-colors hover:border-sky-500/40">
+                  <div className="rounded-2xl border border-border bg-card p-5 transition-colors hover:border-brand/40">
                     <div className="mb-1 flex flex-wrap items-center justify-between gap-2">
                       <h3 className="text-lg font-semibold text-foreground">
                         {role.title} <span className="text-foreground/60">· {role.org}</span>
@@ -410,7 +410,7 @@ export function AboutView({
                           'rounded-full px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wider',
                           role.kind === 'research'
                             ? 'bg-violet-500/10 text-violet-600 dark:text-violet-400'
-                            : 'bg-sky-500/10 text-sky-600 dark:text-sky-400'
+                            : 'bg-brand/10 text-sky-600 dark:text-sky-400'
                         )}
                       >
                         {role.kind === 'research' ? 'Research' : 'Industry'}

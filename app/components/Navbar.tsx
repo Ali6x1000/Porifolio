@@ -4,12 +4,11 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { Menu, X } from 'lucide-react'
 import { cn } from '../../lib/utils'
-import { useTheme } from 'next-themes'
+import { ThemeToggle } from './ThemeToggle'
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
-  const { theme, setTheme } = useTheme()
 
   useEffect(() => {
     const handleScroll = () => {
@@ -42,7 +41,7 @@ export default function Navbar() {
         )}>
           <div className="flex items-center">
             <Link href="/" className="text-xl font-bold tracking-tight">
-              Ali<span className="text-primary">Nawaf</span>
+              Ali<span className="text-brand">Nawaf</span>
             </Link>
           </div>
 
@@ -57,10 +56,12 @@ export default function Navbar() {
                 {item.name}
               </Link>
             ))}
+            <ThemeToggle />
           </div>
 
           {/* Mobile menu button */}
-          <div className="md:hidden flex items-center">
+          <div className="md:hidden flex items-center gap-3">
+            <ThemeToggle />
             <button
               onClick={() => setIsOpen(!isOpen)}
               className="text-muted-foreground hover:text-foreground"

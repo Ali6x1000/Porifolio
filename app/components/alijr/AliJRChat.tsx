@@ -91,7 +91,7 @@ function ToolActivity({ part }: { part: ToolPart }) {
             <span
               key={s.source}
               title={s.source}
-              className="max-w-[220px] truncate rounded-md border border-primary/15 bg-primary/5 px-2 py-0.5 text-[11px] text-foreground/80"
+              className="max-w-[220px] truncate rounded-md border border-brand/15 bg-brand/5 px-2 py-0.5 text-[11px] text-foreground/80"
             >
               {s.label}
             </span>
@@ -209,7 +209,7 @@ function EmptyState({
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.05 * i }}
               whileHover={{ y: -2 }}
-              className="group flex items-start gap-2.5 rounded-xl border border-border/70 bg-card/60 p-3 text-left transition-colors hover:border-primary/30 hover:bg-muted/50"
+              className="group flex items-start gap-2.5 rounded-xl border border-border/70 bg-card/60 p-3 text-left transition-colors hover:border-brand/30 hover:bg-muted/50"
             >
               <Icon size={16} className="mt-0.5 shrink-0 text-muted-foreground group-hover:text-foreground" />
               <span className="min-w-0">
@@ -227,7 +227,7 @@ function EmptyState({
             type="button"
             onClick={() => onCommand(c)}
             title={c.description}
-            className="inline-flex items-center gap-1.5 rounded-full border border-border/70 bg-card/60 px-2.5 py-1 font-mono text-[11px] text-muted-foreground transition hover:border-primary/30 hover:text-foreground"
+            className="inline-flex items-center gap-1.5 rounded-full border border-border/70 bg-card/60 px-2.5 py-1 font-mono text-[11px] text-muted-foreground transition hover:border-brand/30 hover:text-foreground"
           >
             <c.icon size={12} />
             {c.name}
@@ -275,7 +275,7 @@ function SlashMenu({
             i === active ? 'bg-muted' : 'hover:bg-muted/60',
           )}
         >
-          <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+          <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-brand/10 text-brand">
             <c.icon size={14} />
           </span>
           <span className="min-w-0 flex-1">
@@ -455,7 +455,7 @@ export function AliJRChat({
             submit(input);
           }}
           className={cn(
-            'relative mx-auto flex items-end gap-2 rounded-2xl border border-border bg-card/80 p-1.5 shadow-sm transition focus-within:border-primary/40 focus-within:ring-2 focus-within:ring-primary/10',
+            'relative mx-auto flex items-end gap-2 rounded-2xl border border-border bg-card/80 p-1.5 shadow-sm transition focus-within:border-brand/40 focus-within:ring-2 focus-within:ring-brand/10',
             page && 'max-w-2xl',
           )}
         >

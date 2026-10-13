@@ -171,7 +171,7 @@ export default function Resume() {
                 href="https://www.linkedin.com/in/alinawaf/"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-2 hover:text-primary-600"
+                className="flex items-center gap-2 hover:text-brand"
               >
                 <ExternalLink size={16} />
                 <span>LinkedIn</span>
@@ -180,7 +180,7 @@ export default function Resume() {
                 href="https://alinawaf.com"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-2 hover:text-primary-600"
+                className="flex items-center gap-2 hover:text-brand"
               >
                 <ExternalLink size={16} />
                 <span>alinawaf.com</span>
@@ -189,7 +189,7 @@ export default function Resume() {
                 href="https://github.com/Ali6x1000"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-2 hover:text-primary-600"
+                className="flex items-center gap-2 hover:text-brand"
               >
                 <ExternalLink size={16} />
                 <span>GitHub</span>
@@ -211,14 +211,14 @@ export default function Resume() {
             whileInView={{ opacity: 1, y: 0 }}
             className="mb-12"
           >
-            <h2 className="text-2xl font-bold mb-6 border-b-2 border-primary-600 pb-2">
+            <h2 className="text-2xl font-bold mb-6 border-b-2 border-brand pb-2">
               Education
             </h2>
             {education.map((edu, index) => (
-              <div key={index} className="border-l-4 border-primary-600 pl-6">
+              <div key={index} className="border-l-4 border-brand pl-6">
                 <h3 className="text-xl font-semibold">{edu.degree}</h3>
-                <p className="text-primary-600 font-medium">{edu.school}</p>
-                <p className="text-gray-500">{edu.period}</p>
+                <p className="text-brand font-medium">{edu.school}</p>
+                <p className="text-muted-foreground">{edu.period}</p>
               </div>
             ))}
           </motion.section>
@@ -229,16 +229,16 @@ export default function Resume() {
             whileInView={{ opacity: 1, y: 0 }}
             className="mb-12"
           >
-            <h2 className="text-2xl font-bold mb-6 border-b-2 border-primary-600 pb-2">
+            <h2 className="text-2xl font-bold mb-6 border-b-2 border-brand pb-2">
               Experience
             </h2>
             <div className="space-y-8">
               {experiences.map((exp, index) => (
-                <div key={index} className="border-l-4 border-primary-600 pl-6">
+                <div key={index} className="border-l-4 border-brand pl-6">
                   <h3 className="text-xl font-semibold">{exp.title}</h3>
-                  <p className="text-primary-600 font-medium">{exp.company}</p>
-                  <p className="text-gray-500 mb-3">{exp.period}</p>
-                  <ul className="list-disc list-inside space-y-1 text-gray-700">
+                  <p className="text-brand font-medium">{exp.company}</p>
+                  <p className="text-muted-foreground mb-3">{exp.period}</p>
+                  <ul className="list-disc list-inside space-y-1 text-foreground/85">
                     {exp.description.map((item, i) => (
                       <li key={i}>{item}</li>
                     ))}
@@ -254,15 +254,15 @@ export default function Resume() {
             whileInView={{ opacity: 1, y: 0 }}
             className="mb-12"
           >
-            <h2 className="text-2xl font-bold mb-6 border-b-2 border-primary-600 pb-2">
+            <h2 className="text-2xl font-bold mb-6 border-b-2 border-brand pb-2">
               Projects
             </h2>
             <div className="space-y-8">
               {projects.map((proj, index) => (
-                <div key={index} className="border-l-4 border-primary-600 pl-6">
+                <div key={index} className="border-l-4 border-brand pl-6">
                   <h3 className="text-xl font-semibold">{proj.title}</h3>
-                  <p className="text-primary-600 font-medium">{proj.tech}</p>
-                  <ul className="list-disc list-inside space-y-1 text-gray-700 mt-3">
+                  <p className="text-brand font-medium">{proj.tech}</p>
+                  <ul className="list-disc list-inside space-y-1 text-foreground/85 mt-3">
                     {proj.description.map((item, i) => (
                       <li key={i}>{item}</li>
                     ))}
@@ -278,25 +278,25 @@ export default function Resume() {
             whileInView={{ opacity: 1, y: 0 }}
             className="mb-12"
           >
-            <h2 className="text-2xl font-bold mb-6 border-b-2 border-primary-600 pb-2">
+            <h2 className="text-2xl font-bold mb-6 border-b-2 border-brand pb-2">
               Technical Skills
             </h2>
             <div className="grid md:grid-cols-2 gap-6">
               <div>
                 <h3 className="font-semibold mb-2">Languages</h3>
-                <p className="text-gray-700">
+                <p className="text-foreground/85">
                   C, CUDA, Python, Java, Swift, SQL, HTML, CSS, JavaScript (Node.js, Next.js), Rust
                 </p>
               </div>
               <div>
                 <h3 className="font-semibold mb-2">AI/ML</h3>
-                <p className="text-gray-700">
+                <p className="text-foreground/85">
                   PyTorch, TensorFlow, Scikit-learn, NumPy, Pandas, Keras, VAEs, CNN, ResNet, YOLO, LLMs, BERT, Computer Vision, Signal Processing, Model Optimization (Quantization, Pruning)
                 </p>
               </div>
               <div>
                 <h3 className="font-semibold mb-2">Cloud & Tools</h3>
-                <p className="text-gray-700">
+                <p className="text-foreground/85">
                   Azure, AWS, Power BI, SLURM, HPC, Kubernetes, Docker, Lambda functions, Linux, Jenkins, REST APIs, Git, GitHub
                 </p>
               </div>

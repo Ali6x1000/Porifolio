@@ -138,7 +138,7 @@ export default function Projects() {
             {skill && (
               <button
                 onClick={clearSkill}
-                className="inline-flex items-center gap-2 rounded-full border border-primary/40 bg-primary/10 px-3 py-1 text-sm text-primary hover:bg-primary/15"
+                className="inline-flex items-center gap-2 rounded-full border border-brand/40 bg-brand/10 px-3 py-1 text-sm text-brand hover:bg-brand/15"
               >
                 Showing projects using <strong>{skill}</strong>
                 <X size={14} />

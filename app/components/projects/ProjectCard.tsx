@@ -15,7 +15,7 @@ function ProjectLinkButton({ link, primary }: { link: ProjectLink; primary?: boo
   const className = cn(
     'inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition-colors',
     primary
-      ? 'bg-primary text-primary-foreground hover:bg-primary/90'
+      ? 'bg-brand text-brand-foreground hover:bg-brand/90'
       : 'border border-border text-muted-foreground hover:border-foreground/30 hover:text-foreground'
   );
   const content = (
@@ -77,13 +77,13 @@ export function ProjectCard({
     <article
       id={project.slug}
       className={cn(
-        'group flex scroll-mt-28 flex-col rounded-2xl border border-border bg-card p-6 transition-all duration-300 hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-xl target:border-primary target:ring-2 target:ring-primary/30',
-        wide && 'bg-gradient-to-br from-primary/10 via-card to-card md:p-8',
+        'group flex scroll-mt-28 flex-col rounded-2xl border border-border bg-card p-6 transition-all duration-300 hover:-translate-y-0.5 hover:border-brand/40 hover:shadow-xl target:border-brand target:ring-2 target:ring-brand/30',
+        wide && 'bg-gradient-to-br from-brand/10 via-card to-card md:p-8',
         className
       )}
     >
       <div className="mb-3 flex items-start justify-between gap-3">
-        <p className="text-[11px] font-semibold uppercase tracking-wider text-primary">{project.category}</p>
+        <p className="text-[11px] font-semibold uppercase tracking-wider text-brand">{project.category}</p>
         <StatusBadge status={project.status} />
       </div>
 
@@ -94,7 +94,7 @@ export function ProjectCard({
         <ul className={cn('mb-5 text-sm', wide ? 'grid gap-x-8 gap-y-2 md:grid-cols-2' : 'space-y-2')}>
           {highlights.map((item) => (
             <li key={item} className="flex gap-2.5 text-foreground/85">
-              <span className="mt-2 h-1 w-1 shrink-0 rounded-full bg-primary" />
+              <span className="mt-2 h-1 w-1 shrink-0 rounded-full bg-brand" />
               <span>{item}</span>
             </li>
           ))}
@@ -108,7 +108,7 @@ export function ProjectCard({
             className={cn(
               'rounded-md border px-2 py-0.5 text-[11px] font-medium',
               matches(tech)
-                ? 'border-primary/50 bg-primary/15 text-primary'
+                ? 'border-brand/50 bg-brand/15 text-brand'
                 : 'border-border/60 bg-secondary text-secondary-foreground'
             )}
           >

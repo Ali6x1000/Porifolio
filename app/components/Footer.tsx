@@ -6,7 +6,7 @@ export default function Footer() {
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="flex flex-col md:flex-row justify-between items-center gap-6">
           <div className="text-center md:text-left">
-            <h3 className="text-xl font-bold tracking-tight">Ali<span className="text-primary">Nawaf</span></h3>
+            <h3 className="text-xl font-bold tracking-tight">Ali<span className="text-brand">Nawaf</span></h3>
             <p className="text-muted-foreground text-sm mt-1">Computer Science Student & Developer</p>
           </div>
           

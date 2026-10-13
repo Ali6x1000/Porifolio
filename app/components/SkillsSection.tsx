@@ -27,10 +27,10 @@ function SkillChip({ skill }: { skill: string }) {
     <Link
       href={`/projects?skill=${encodeURIComponent(skill)}`}
       title={`See ${count} project${count === 1 ? '' : 's'} using ${skill}`}
-      className="group/chip inline-flex items-center gap-1.5 rounded-full border border-border bg-background/60 px-2.5 py-1 text-xs transition-colors hover:border-primary/50 hover:bg-primary/10 hover:text-primary"
+      className="group/chip inline-flex items-center gap-1.5 rounded-full border border-border bg-background/60 px-2.5 py-1 text-xs transition-colors hover:border-brand/50 hover:bg-brand/10 hover:text-brand"
     >
       {skill}
-      <span className="rounded-full bg-muted px-1.5 text-[10px] text-muted-foreground group-hover/chip:bg-primary/20 group-hover/chip:text-primary">
+      <span className="rounded-full bg-muted px-1.5 text-[10px] text-muted-foreground group-hover/chip:bg-brand/20 group-hover/chip:text-brand">
         {count}
       </span>
     </Link>
@@ -71,19 +71,19 @@ export function SkillsSection() {
                 viewport={{ once: true }}
                 transition={{ duration: 0.4, delay: index * 0.06 }}
                 className={cn(
-                  'group relative flex flex-col overflow-hidden rounded-2xl border border-border bg-card p-6 transition-all duration-300 hover:border-primary/40 hover:shadow-xl',
+                  'group relative flex flex-col overflow-hidden rounded-2xl border border-border bg-card p-6 transition-all duration-300 hover:border-brand/40 hover:shadow-xl',
                   SPANS[group.span],
-                  group.span === 2 && 'bg-gradient-to-br from-primary/10 via-card to-card',
+                  group.span === 2 && 'bg-gradient-to-br from-brand/10 via-card to-card',
                   isStrip && 'lg:flex-row lg:items-center lg:gap-8'
                 )}
               >
                 <Icon
                   size={120}
-                  className="pointer-events-none absolute -right-6 -top-6 text-primary opacity-[0.04] transition-opacity group-hover:opacity-[0.08]"
+                  className="pointer-events-none absolute -right-6 -top-6 text-brand opacity-[0.04] transition-opacity group-hover:opacity-[0.08]"
                 />
                 <div className={cn('flex items-start gap-3', isStrip ? 'lg:w-72 lg:shrink-0' : 'mb-4')}>
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/10">
-                    <Icon className="text-primary" size={20} />
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-brand/10">
+                    <Icon className="text-brand" size={20} />
                   </div>
                   <div>
                     <h3 className="font-semibold">{group.title}</h3>
@@ -100,7 +100,7 @@ export function SkillsSection() {
                 {group.proof && (
                   <Link
                     href={group.proof.href}
-                    className="mb-4 flex items-start gap-2 rounded-lg border border-border/70 bg-background/50 px-3 py-2 text-xs text-foreground/85 transition-colors hover:border-primary/40"
+                    className="mb-4 flex items-start gap-2 rounded-lg border border-border/70 bg-background/50 px-3 py-2 text-xs text-foreground/85 transition-colors hover:border-brand/40"
                   >
                     <Trophy size={14} className="mt-0.5 shrink-0 text-amber-500" />
                     <span>{group.proof.text}</span>
@@ -115,7 +115,7 @@ export function SkillsSection() {
                         <Link
                           key={project.slug}
                           href={projectHref(project.slug)}
-                          className="inline-flex items-center gap-1 text-sm font-medium text-primary hover:underline"
+                          className="inline-flex items-center gap-1 text-sm font-medium text-brand hover:underline"
                         >
                           {project.title}
                           <ArrowRight size={12} />

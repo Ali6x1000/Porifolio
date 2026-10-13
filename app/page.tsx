@@ -26,7 +26,7 @@ export default function Home() {
             className="mb-6 flex justify-center"
           >
             <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-muted text-sm font-medium border border-border">
-              <Sparkles size={16} className="text-primary" />
+              <Sparkles size={16} className="text-brand" />
               Machine Learning , Artificial Inteligence and Math enthusiast
             </span>
           </motion.div>
@@ -71,7 +71,7 @@ export default function Home() {
       <section className="relative z-10 py-16 px-4">
         <div className="max-w-5xl mx-auto">
           <div className="relative rounded-3xl overflow-hidden border border-border bg-card/50 backdrop-blur-sm p-8 md:p-12 shadow-2xl">
-            <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-transparent pointer-events-none" />
+            <div className="absolute inset-0 bg-gradient-to-br from-brand/10 to-transparent pointer-events-none" />
             <div className="relative flex flex-col md:flex-row items-center justify-between gap-8">
               <div className="flex-1 text-center md:text-left">
                 <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-green-500/10 text-green-500 text-xs font-bold uppercase tracking-wider mb-4 border border-green-500/20">
@@ -98,8 +98,8 @@ export default function Home() {
                 </div>
               </div>
               <div className="flex-1 flex justify-center w-full max-w-sm">
-                 <div className="w-full aspect-square rounded-2xl bg-gradient-to-tr from-primary/20 to-purple-500/20 border border-white/10 flex items-center justify-center shadow-inner relative overflow-hidden">
-                    <Sparkles className="w-16 h-16 text-primary animate-pulse" />
+                 <div className="w-full aspect-square rounded-2xl bg-gradient-to-tr from-brand/20 to-purple-500/20 border border-border flex items-center justify-center shadow-inner relative overflow-hidden">
+                    <Sparkles className="w-16 h-16 text-brand animate-pulse" />
                  </div>
               </div>
             </div>
@@ -117,7 +117,7 @@ export default function Home() {
               <h2 className="text-3xl font-bold mb-2">Featured Work</h2>
               <p className="text-muted-foreground">Selected AI safety and medical AI work</p>
             </div>
-            <Link href="/projects" className="hidden md:flex text-sm font-medium text-primary hover:underline items-center gap-1">
+            <Link href="/projects" className="hidden md:flex text-sm font-medium text-brand hover:underline items-center gap-1">
               View all <ArrowRight size={16} />
             </Link>
           </div>

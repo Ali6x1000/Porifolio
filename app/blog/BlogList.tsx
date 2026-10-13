@@ -18,7 +18,7 @@ export default function BlogList({ posts }: { posts: BlogPost[] }) {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: index * 0.1 }}
-          className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300"
+          className="bg-card border border-border rounded-2xl shadow-sm overflow-hidden hover:shadow-xl hover:border-brand/40 transition-all duration-300"
         >
           <div className="md:flex">
             {post.featuredImage && (
@@ -31,7 +31,7 @@ export default function BlogList({ posts }: { posts: BlogPost[] }) {
               </div>
             )}
             <div className={`p-6 ${post.featuredImage ? 'md:w-2/3' : 'w-full'}`}>
-              <div className="flex items-center gap-4 text-sm text-gray-500 mb-3">
+              <div className="flex items-center gap-4 text-sm text-muted-foreground mb-3">
                 <div className="flex items-center gap-1">
                   <Calendar size={16} />
                   {new Date(post.date).toLocaleDateString()}
@@ -41,16 +41,16 @@ export default function BlogList({ posts }: { posts: BlogPost[] }) {
                   {post.readTime}
                 </div>
               </div>
-              <h2 className="text-2xl font-bold text-gray-900 mb-3 hover:text-primary-600 transition-colors">
+              <h2 className="text-2xl font-bold text-foreground mb-3 hover:text-brand transition-colors">
                 <Link href={`/blog/${post.slug}`}>{post.title}</Link>
               </h2>
-              <p className="text-gray-600 mb-4 line-clamp-3">{post.excerpt}</p>
+              <p className="text-muted-foreground mb-4 line-clamp-3">{post.excerpt}</p>
               <div className="flex flex-wrap gap-2 mb-4">
                 {post.tags.map((tag) => (
-                  <span key={tag} className="bg-primary-100 text-primary-800 px-3 py-1 rounded-full text-sm">{tag}</span>
+                  <span key={tag} className="bg-brand/10 text-brand px-3 py-1 rounded-full text-sm">{tag}</span>
                 ))}
               </div>
-              <Link href={`/blog/${post.slug}`} className="inline-flex items-center gap-2 text-primary-600 hover:text-primary-700 font-medium transition-colors">
+              <Link href={`/blog/${post.slug}`} className="inline-flex items-center gap-2 text-brand hover:text-brand/80 font-medium transition-colors">
                 Read more <ArrowRight size={16} />
               </Link>
             </div>

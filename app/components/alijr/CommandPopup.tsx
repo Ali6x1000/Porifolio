@@ -75,7 +75,7 @@ function ResumeView({ text }: { text: string }) {
       {rest.map((line, i) => {
         if (RESUME_SECTIONS.test(line)) {
           return (
-            <p key={i} className="border-b border-border/70 pb-1 pt-3 text-[11px] font-semibold uppercase tracking-wider text-primary">
+            <p key={i} className="border-b border-border/70 pb-1 pt-3 text-[11px] font-semibold uppercase tracking-wider text-brand">
               {line}
             </p>
           );
@@ -122,7 +122,7 @@ function ResultCard({ hit, index }: { hit: KnowledgeHit; index: number }) {
         </div>
         <span
           title="Semantic similarity"
-          className="shrink-0 rounded-full bg-primary/10 px-2 py-0.5 text-[11px] font-medium tabular-nums text-primary"
+          className="shrink-0 rounded-full bg-brand/10 px-2 py-0.5 text-[11px] font-medium tabular-nums text-brand"
         >
           {Math.round(hit.score * 100)}%
         </span>
@@ -139,7 +139,7 @@ function ResultCard({ hit, index }: { hit: KnowledgeHit; index: number }) {
         <button
           type="button"
           onClick={() => setExpanded((v) => !v)}
-          className="mt-1 inline-flex items-center gap-1 text-[11px] font-medium text-primary hover:underline"
+          className="mt-1 inline-flex items-center gap-1 text-[11px] font-medium text-brand hover:underline"
         >
           {expanded ? 'Show less' : 'Show more'}
           <ChevronDown size={12} className={cn('transition', expanded && 'rotate-180')} />
@@ -159,7 +159,7 @@ function SearchBox({ view, onNavigate }: { view: Extract<CommandView, { kind: 's
   };
 
   return (
-    <form onSubmit={submit} className="flex items-center gap-2 rounded-xl border border-border bg-background/70 px-3 focus-within:border-primary/40">
+    <form onSubmit={submit} className="flex items-center gap-2 rounded-xl border border-border bg-background/70 px-3 focus-within:border-brand/40">
       <Search size={14} className="shrink-0 text-muted-foreground" />
       <input
         autoFocus
@@ -267,7 +267,7 @@ export function CommandPopup({
                       <ArrowLeft size={15} />
                     </button>
                   )}
-                  <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                  <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-brand/10 text-brand">
                     <Icon size={16} />
                   </span>
                   <div className="min-w-0 flex-1">
@@ -314,9 +314,9 @@ export function CommandPopup({
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: i * 0.02 }}
                       onClick={() => onNavigate({ kind: 'search', folder: 'projects', project, query: '' })}
-                      className="group flex items-center gap-2.5 rounded-xl border border-border/70 bg-background/60 px-3 py-2.5 text-left transition hover:border-primary/30 hover:bg-muted/50"
+                      className="group flex items-center gap-2.5 rounded-xl border border-border/70 bg-background/60 px-3 py-2.5 text-left transition hover:border-brand/30 hover:bg-muted/50"
                     >
-                      <FolderGit2 size={15} className="shrink-0 text-muted-foreground group-hover:text-primary" />
+                      <FolderGit2 size={15} className="shrink-0 text-muted-foreground group-hover:text-brand" />
                       <span className="truncate text-sm">{project}</span>
                     </motion.button>
                   ))}
