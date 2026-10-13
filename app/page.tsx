@@ -97,7 +97,7 @@ export default function Home() {
           >
             <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-muted text-sm font-medium border border-border">
               <Sparkles size={16} className="text-primary" />
-              Building the future of AI & Web
+              Machine Learning , Artificial Inteligence and Math enthusiast
             </span>
           </motion.div>
 
