@@ -2,7 +2,9 @@ const embedderFiles = [
   './models/**/*',
   './node_modules/onnxruntime-node/package.json',
   './node_modules/onnxruntime-node/dist/**/*',
-  './node_modules/onnxruntime-node/bin/napi-v*/linux/x64/**/*',
+  // CPU runtime only; on linux x64 the postinstall can also download ~300 MB of CUDA libraries.
+  './node_modules/onnxruntime-node/bin/napi-v*/linux/x64/libonnxruntime.so.1',
+  './node_modules/onnxruntime-node/bin/napi-v*/linux/x64/onnxruntime_binding.node',
 ];
 
 /** @type {import('next').NextConfig} */
@@ -26,6 +28,7 @@ const nextConfig = {
         'node_modules/onnxruntime-node/bin/napi-v*/darwin/**',
         'node_modules/onnxruntime-node/bin/napi-v*/win32/**',
         'node_modules/onnxruntime-node/bin/napi-v*/linux/arm64/**',
+        'node_modules/onnxruntime-node/bin/napi-v*/linux/x64/libonnxruntime_providers_*',
         'node_modules/onnxruntime-web/**',
         'node_modules/@img/**/darwin*/**',
       ],
