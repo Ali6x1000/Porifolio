@@ -1,4 +1,11 @@
 export const ALIJR_CHAT_MODEL = process.env.ALIJR_CHAT_MODEL || 'gemini-flash-latest';
+// Other Gemini models on the same key, tried in order when the primary is overloaded. Lite models have separate capacity.
+export const ALIJR_GEMINI_FALLBACKS = (process.env.ALIJR_GEMINI_FALLBACKS || 'gemini-3.5-flash-lite,gemini-3-flash-preview')
+  .split(',')
+  .map((m) => m.trim())
+  .filter(Boolean);
+// An attempt that produces no output within this window is abandoned for the next model.
+export const ALIJR_FIRST_OUTPUT_TIMEOUT_MS = Number(process.env.ALIJR_FIRST_OUTPUT_TIMEOUT_MS) || 12_000;
 // Free-tier Groq models (needs GROQ_API_KEY), tried in order when Gemini fails. Each has its own daily limit.
 export const ALIJR_GROQ_MODELS = (process.env.ALIJR_GROQ_MODELS || 'openai/gpt-oss-120b,qwen/qwen3.8-27b')
   .split(',')

@@ -24,8 +24,8 @@ export async function POST(req: Request) {
     messages: await convertToModelMessages(recent),
     tools: alijrTools,
     stopWhen: isStepCount(6),
-    // Each attempt already walks the whole fallback chain.
-    maxRetries: 1,
+    // Each attempt already walks the whole fallback chain; a retry would rerun it past maxDuration.
+    maxRetries: 0,
   });
 
   return result.toUIMessageStreamResponse({
